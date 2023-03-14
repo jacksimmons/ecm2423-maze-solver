@@ -1,5 +1,13 @@
 #include "Vector2.h"
 
+// Vector2 stands for 2D vector (x and y components)
+// It is a struct used to represent positions in the maze
+
+// Indices and Vector2:
+// Due to the way 2D arrays were implemented, the components of Vector2 and the array indices
+// are swapped. The "y" component of the 2D arrays map to the "x" component of the Vector2
+// in the `maze` array, for example.
+
 Vector2::Vector2()
 {
     set(0, 0);

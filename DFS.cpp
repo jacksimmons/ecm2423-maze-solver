@@ -3,23 +3,15 @@
 #include <ctime>
 #include <stack>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include "Maze.h"
 #include "DFS.h"
 
-// Indices and Vector2:
-// Due to the way 2D arrays were implemented, the components of Vector2 and the array indices
-// are swapped. The "y" component of the 2D arrays map to the "x" component of the Vector2
-// in the `maze` array, for example.
-
-const bool pauseForInput = false;
-const bool outputEveryCycle = false;
-const bool suppressFinalDiagram = false;
-const bool suppressFinalPath = true;
-const bool suppressOutput = true;
+// Parameters changing the output and function of the program - the comments show what happens when each is true
+const bool pauseForInput = false; // Pauses at the start of each iteration
+const bool outputEveryCycle = false; // Prints the maze with colour coding after every iteration
+const bool suppressFinalDiagram = false; // Suppresses printing of the fully explored maze at the end
+const bool suppressFinalPath = true; // Suppresses printing of the ordered nodes on the path at the end
+const bool suppressOutput = true; // Suppresses debug output, giving information on what the algorithm is doing
 
 // Every element in path is stored as either a pointer to start, or to the following vectors (so don't garbage collect them!)
 // Global variables so they can be garbage collected at the end of the program
@@ -29,12 +21,15 @@ Vector2 *RIGHT = new Vector2(1, 0);
 Vector2 *DOWN = new Vector2(0, 1);
 Vector2 *ZERO = new Vector2(0, 0);
 
+// Stores how many times the algorithm has been entered
 int loop_count = 0;
 
 int main()
 {
+    // Create a clock to measure runtime speed
     const clock_t startTime = clock();
 
+    // Initialise the maze and visited arrays
     char* maze;
     bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
 
@@ -47,9 +42,11 @@ int main()
         }
     }
 
+    // Initialise the vectors used to control the search
     Vector2 *start = new Vector2();
     Vector2 *goal = new Vector2();
-    Vector2 *direction = new Vector2();
+
+    // Read the vectors from the read maze
     tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
     maze = std::get<0>(mazeInfo);
     start = std::get<1>(mazeInfo);
@@ -60,19 +57,23 @@ int main()
     std::cout << "Goal: " << std::endl;
     Vector2::print(*goal);
 
+    // Complete the search
     std::vector<Vector2 *> finalPath = dfs(start, goal, maze, visited);
 
+    // Final path output
     if (!suppressFinalPath)
     {
         cout << "Final path: " << std::endl;
         for (int i = 0; i < finalPath.size(); i++)
         {
+            // Calculate the position of the ith element in the path
             Vector2 *calcPos = calculatePos(finalPath, i);
             Vector2::print(*calcPos);
             delete calcPos;
         }
     }
     
+    // Calculate the number of visited nodes
     int numNodes = 0;
     for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
     {
@@ -82,6 +83,7 @@ int main()
         }
     }
 
+    // Execution statistics
     std::cout << "Number of nodes visited: " << numNodes << endl;
     std::cout << "Number of steps in final path: " << finalPath.size() << endl;
     std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
@@ -90,7 +92,6 @@ int main()
     // Garbage collection
     delete start;
     delete goal;
-    delete direction;
     
     delete maze;
     delete visited;
@@ -108,12 +109,15 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
 {
     visited[calculatePosIndex(start)] = true;
 
+    // Initialise direction and pos
     Vector2 *direction = new Vector2();
     Vector2 *pos = new Vector2(start->x, start->y); // Copy start into pos
 
+    // Initialise the path
     std::vector<Vector2 *> path;
     path.push_back(start);
 
+    // Initialise the dfs stack
     std::stack<Vector2 *> dfs_stack;
     dfs_stack.push(start);
 
@@ -127,19 +131,21 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
         // Check if the direction has been assigned, if not calculate it
         if (Vector2::isZero(*direction))
         {
-
+            // Calculate position from the most recent visited node
             Vector2 *calcedPos = calculatePos(path, path.size() - 1);
             pos->set(calcedPos->x, calcedPos->y);
             delete calcedPos;
 
+            // The next direction to travel in
             Vector2 *selectedDir;
 
+            // Initialise positions in every cardinal direction from pos
             Vector2 *posUp = *pos + *UP;
             Vector2 *posLeft = *pos + *LEFT;
             Vector2 *posDown = *pos + *DOWN;
             Vector2 *posRight = *pos + *RIGHT;
 
-            // Find a valid direction to travel down that hasn't been explored
+            // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
             if (pos->y > 0 && maze[calculatePosIndex(posUp)] != WALL && !visited[calculatePosIndex(posUp)])
                 selectedDir = UP;
             else if (pos->x > 0 && maze[calculatePosIndex(posLeft)] != WALL && !visited[calculatePosIndex(posLeft)])
@@ -157,6 +163,7 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
                     std::cout << "No directions are possible... backtracking" << std::endl;
                 visited[calculatePosIndex(pos)] = true;
 
+                // Backtracking, so remove most recent node
                 dfs_stack.pop();
                 path.pop_back();
 
@@ -167,6 +174,7 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
             // The direction has been set, need to restart block
             direction->set(selectedDir->x, selectedDir->y);
 
+            // Garbage collection
             delete posUp;
             delete posLeft;
             delete posDown;
@@ -193,9 +201,11 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
                 // If the adjacent node is in the bounds, we can assign to the adjacent std::vector
                 if (adjacent_in_maze_bounds)
                 {
+                    // Add the direction to the position
                     pos->set(pos->x + direction->x, pos->y + direction->y);
                     visited[calculatePosIndex(pos)] = true;
 
+                    // Add a pointer to the right direction to the path
                     if (*direction == *LEFT)
                     {
                         dfs_stack.push(LEFT);
@@ -272,6 +282,7 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
     return path;
 }
 
+// Get the ith element of the path, and return its vector form
 Vector2 *calculatePos(std::vector<Vector2 *> &path, int index)
 {
     Vector2 *pos = new Vector2();
@@ -284,53 +295,8 @@ Vector2 *calculatePos(std::vector<Vector2 *> &path, int index)
     return pos;
 }
 
+// Convert vector to index
 int calculatePosIndex(Vector2 *pos)
 {
     return (pos->y) * MAZE(COLS) + pos->x;
-}
-
-void printMaze(char* maze, std::vector<Vector2 *> path, bool* visited)
-{
-    #ifdef _WIN32
-    HANDLE hConsole;
-    int c = 0;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    for (int i = 0; i < MAZE(ROWS); i++)
-    {
-        for (int j = 0; j < MAZE(COLS); j++)
-        {
-            Vector2 *pos = new Vector2(j, i);
-            if (maze[i * MAZE(COLS) + j] == WALL)
-                c = 9; // Blue, for all walls
-            else
-            {
-                if (visited[i * MAZE(COLS) + j])
-                    c = 12; // Red, for all visited nodes not on the path (they have been excluded)
-                else
-                    c = 0; // Grey, for all unvisited nodes
-
-                for (int i = 0; i < path.size(); i++)
-                {
-                    Vector2 *calcedPos = calculatePos(path, i);
-                    if (*pos == *calcedPos)
-                    {
-                        c = 10; // Lime, for all nodes on the path
-                    }
-                    delete calcedPos;
-                }
-            }
-            delete pos;
-            
-            // Set the colour of the console for this char only
-            SetConsoleTextAttribute(hConsole, c);
-            std::cout << maze[i * MAZE(COLS) + j];
-        }
-        //.Newline for next row
-        std::cout << std::endl;
-    }
-
-    // Reset colour for other output later on
-    SetConsoleTextAttribute(hConsole, 0);
-    #endif
 }
