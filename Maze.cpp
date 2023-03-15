@@ -101,3 +101,22 @@ void printMaze(char* maze, std::vector<Vector2 *> path, bool* visited)
     SetConsoleTextAttribute(hConsole, 0);
     #endif
 }
+
+// Get the ith element of the path, and return its vector form
+Vector2 *calculatePos(std::vector<Vector2 *> &path, int index)
+{
+    Vector2 *pos = new Vector2();
+    Vector2 *dir;
+    for (int i = 0; i <= index; i++)
+    {
+        dir = path.at(i);
+        pos->set(pos->x + dir->x, pos->y + dir->y);
+    }
+    return pos;
+}
+
+// Convert vector to index
+int calculatePosIndex(Vector2 *pos)
+{
+    return (pos->y) * MAZE(COLS) + pos->x;
+}

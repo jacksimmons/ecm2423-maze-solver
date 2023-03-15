@@ -21,92 +21,92 @@ Vector2 *RIGHT = new Vector2(1, 0);
 Vector2 *DOWN = new Vector2(0, 1);
 Vector2 *ZERO = new Vector2(0, 0);
 
-// Stores how many times the algorithm has been entered
-int loop_count = 0;
+// int main()
+// {
+//     // Create a clock to measure runtime speed
+//     const clock_t startTime = clock();
 
-int main()
+//     // Initialise the maze and visited arrays
+//     char* maze;
+//     bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
+
+//     // Make the visited array full of "false"
+//     for (int i = 0; i < MAZE(ROWS); i++)
+//     {
+//         for (int j = 0; j < MAZE(COLS); j++)
+//         {
+//             visited[i * MAZE(COLS) + j] = false;
+//         }
+//     }
+
+//     // Initialise the vectors used to control the search
+//     Vector2 *start = new Vector2();
+//     Vector2 *goal = new Vector2();
+
+//     // Read the vectors from the read maze
+//     tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
+//     maze = std::get<0>(mazeInfo);
+//     start = std::get<1>(mazeInfo);
+//     goal = std::get<2>(mazeInfo);
+
+//     std::cout << "Start: " << std::endl;
+//     Vector2::print(*start);
+//     std::cout << "Goal: " << std::endl;
+//     Vector2::print(*goal);
+
+//     // Complete the search
+//     std::vector<Vector2 *> finalPath = dfs(start, goal, maze, visited);
+
+//     // Final path output
+//     if (!suppressFinalPath)
+//     {
+//         cout << "Final path: " << std::endl;
+//         for (int i = 0; i < finalPath.size(); i++)
+//         {
+//             // Calculate the position of the ith element in the path
+//             Vector2 *calcPos = calculatePos(finalPath, i);
+//             Vector2::print(*calcPos);
+//             delete calcPos;
+//         }
+//     }
+    
+//     // Calculate the number of visited nodes
+//     int numNodes = 0;
+//     for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
+//     {
+//         if (visited[i])
+//         {
+//             numNodes++;
+//         }
+//     }
+
+//     // Execution statistics
+//     std::cout << "Number of nodes visited: " << numNodes << endl;
+//     std::cout << "Number of steps in final path: " << finalPath.size() << endl;
+//     std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
+//     std::cout << "Loop count: " << loop_count;
+
+//     // Garbage collection
+//     delete start;
+//     delete goal;
+    
+//     delete maze;
+//     delete visited;
+    
+//     delete UP;
+//     delete DOWN;
+//     delete LEFT;
+//     delete RIGHT;
+//     delete ZERO;
+
+//     return 0;
+// }
+
+std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
 {
-    // Create a clock to measure runtime speed
-    const clock_t startTime = clock();
+    // Stores how many times the algorithm has been entered
+    int loop_count = 0;
 
-    // Initialise the maze and visited arrays
-    char* maze;
-    bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
-
-    // Make the visited array full of "false"
-    for (int i = 0; i < MAZE(ROWS); i++)
-    {
-        for (int j = 0; j < MAZE(COLS); j++)
-        {
-            visited[i * MAZE(COLS) + j] = false;
-        }
-    }
-
-    // Initialise the vectors used to control the search
-    Vector2 *start = new Vector2();
-    Vector2 *goal = new Vector2();
-
-    // Read the vectors from the read maze
-    tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
-    maze = std::get<0>(mazeInfo);
-    start = std::get<1>(mazeInfo);
-    goal = std::get<2>(mazeInfo);
-
-    std::cout << "Start: " << std::endl;
-    Vector2::print(*start);
-    std::cout << "Goal: " << std::endl;
-    Vector2::print(*goal);
-
-    // Complete the search
-    std::vector<Vector2 *> finalPath = dfs(start, goal, maze, visited);
-
-    // Final path output
-    if (!suppressFinalPath)
-    {
-        cout << "Final path: " << std::endl;
-        for (int i = 0; i < finalPath.size(); i++)
-        {
-            // Calculate the position of the ith element in the path
-            Vector2 *calcPos = calculatePos(finalPath, i);
-            Vector2::print(*calcPos);
-            delete calcPos;
-        }
-    }
-    
-    // Calculate the number of visited nodes
-    int numNodes = 0;
-    for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
-    {
-        if (visited[i])
-        {
-            numNodes++;
-        }
-    }
-
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << numNodes << endl;
-    std::cout << "Number of steps in final path: " << finalPath.size() << endl;
-    std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << endl;
-    std::cout << "Loop count: " << loop_count;
-
-    // Garbage collection
-    delete start;
-    delete goal;
-    
-    delete maze;
-    delete visited;
-    
-    delete UP;
-    delete DOWN;
-    delete LEFT;
-    delete RIGHT;
-    delete ZERO;
-
-    return 0;
-}
-
-std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
-{
     visited[calculatePosIndex(start)] = true;
 
     // Initialise direction and pos
@@ -280,23 +280,4 @@ std::vector<Vector2 *> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visi
     delete pos;
     delete direction;
     return path;
-}
-
-// Get the ith element of the path, and return its vector form
-Vector2 *calculatePos(std::vector<Vector2 *> &path, int index)
-{
-    Vector2 *pos = new Vector2();
-    Vector2 *dir;
-    for (int i = 0; i <= index; i++)
-    {
-        dir = path.at(i);
-        pos->set(pos->x + dir->x, pos->y + dir->y);
-    }
-    return pos;
-}
-
-// Convert vector to index
-int calculatePosIndex(Vector2 *pos)
-{
-    return (pos->y) * MAZE(COLS) + pos->x;
 }

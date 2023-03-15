@@ -1,4 +1,5 @@
 #include "Vector2.h"
+#include <math.h>
 
 // Vector2 stands for 2D vector (x and y components)
 // It is a struct used to represent positions in the maze
@@ -22,6 +23,11 @@ void Vector2::set(int _x, int _y)
 {
     x = _x;
     y = _y;
+}
+
+float Vector2::distTo(Vector2 v2)
+{
+    return sqrt(pow(x - v2.x, 2) + pow(y - v2.y, 2));
 }
 
 bool Vector2::operator==(const Vector2 v2)

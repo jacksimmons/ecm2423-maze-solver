@@ -13,6 +13,7 @@ struct Vector2
     Vector2();
     Vector2(int _x, int _y);
     void set(int _x, int _y);
+    float distTo(Vector2 vec);
     bool operator==(const Vector2 vec);
     bool operator!=(const Vector2 vec);
     void operator+=(const Vector2 vec);

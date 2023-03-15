@@ -1,4 +1,8 @@
 #include <vector>
+#include <tuple>
 #include "Vector2.h"
+#include "Node.h"
 
-std::vector<Vector2 *> astar(Vector2 *start, Vector2 *goal, char* maze, bool* visited);
+std::tuple<std::vector<Vector2 *>, int> astar(Vector2 *start, Vector2 *goal, char* maze);
+
+float calculateCost(Node *node);

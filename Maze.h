@@ -32,5 +32,6 @@ Vector2 *calculatePos(std::vector<Vector2 *> &path, int index);
 int calculatePosIndex(Vector2 *pos);
 void printMaze(char* maze, std::vector<Vector2 *> path, bool* visited);
 std::tuple<char *, Vector2 *, Vector2 *> readMaze();
-
+Vector2 *calculatePos(std::vector<Vector2 *> &path, int index);
+int calculatePosIndex(Vector2 *pos);
 #endif
