@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <ctime>
 #include <vector>
-#include <queue>
+#include <stack>
 
 #include <math.h>
 
@@ -15,10 +15,10 @@
 #include "Vector2.h"
 
 // Parameters changing the output and function of the program - the comments show what happens when each is true
-const bool pauseForInput = false; // Pauses at the start of each iteration
-const bool outputEveryCycle = true; // Prints the maze with colour coding after every iteration
+const bool pauseForInput = true; // Pauses at the start of each iteration
+const bool outputEveryCycle = false; // Prints the maze with colour coding after every iteration
 const bool suppressFinalDiagram = false; // Suppresses printing of the fully explored maze at the end
-const bool suppressFinalPath = true; // Suppresses printing of the ordered nodes on the path at the end
+const bool suppressFinalPath = false; // Suppresses printing of the ordered nodes on the path at the end
 const bool suppressOutput = true; // Suppresses debug output, giving information on what the algorithm is doing
 
 // Every element in path is stored as either a pointer to start, or to the following vectors (so don't garbage collect them!)
@@ -34,6 +34,16 @@ int main()
 
     // Initialise the maze
     char* maze;
+    bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
+
+    // Make the visited array full of "false"
+    for (int i = 0; i < MAZE(ROWS); i++)
+    {
+        for (int j = 0; j < MAZE(COLS); j++)
+        {
+            visited[i * MAZE(COLS) + j] = false;
+        }
+    }
 
     // Initialise the vectors used to control the search
     Vector2 *start = new Vector2();
@@ -51,20 +61,23 @@ int main()
     Vector2::print(*goal);
 
     // Complete the search
-    std::tuple<std::vector<Vector2 *>, int> pathData = astar(start, goal, maze);
+    std::tuple<std::vector<Vector2 *>, int> pathData = astar(start, goal, maze, visited);
     std::vector<Vector2 *> finalPath = std::get<0>(pathData);
     int loop_count = std::get<1>(pathData);
+
+    // Final diagram output
+    if (!suppressFinalDiagram)
+    {
+        printMaze(maze, finalPath, visited);
+    }
 
     // Final path output
     if (!suppressFinalPath)
     {
         cout << "Final path: " << std::endl;
-        for (int i = 0; i < finalPath.size(); i++)
+        for (int i = finalPath.size() - 1; i >= 0; i--)
         {
-            // Calculate the position of the ith element in the path
-            Vector2 *calcPos = calculatePos(finalPath, i);
-            Vector2::print(*calcPos);
-            delete calcPos;
+            Vector2::print(*finalPath.at(i));
         }
     }
     
@@ -81,144 +94,233 @@ int main()
     delete start;
     delete goal;
     
-    delete maze;
+    delete[] maze;
+    delete[] visited;
+
+    cin.get();
 
     return 0;
 }
 
-std::tuple<std::vector<Vector2 *>, int> astar(Vector2 *start, Vector2 *goal, char* maze)
+std::tuple<std::vector<Vector2 *>, int> astar(Vector2 *start, Vector2 *goal, char* maze, bool* excluded)
 {
     int loop_count = 0;
 
     Vector2 *pos = new Vector2();
 
-    // Direction vectors
+    // Cardinal direction vectors
     Vector2 *LEFT = new Vector2(-1, 0);
     Vector2 *UP = new Vector2(0, -1);
     Vector2 *RIGHT = new Vector2(1, 0);
     Vector2 *DOWN = new Vector2(0, 1);
     Vector2 *ZERO = new Vector2(0, 0);
 
-    // Initialise the path
-    std::vector<Vector2 *> path;
-    std::queue<Node *> astar_queue;
+    Vector2 *posUp = new Vector2();
+    Vector2 *posLeft = new Vector2();
+    Vector2 *posRight = new Vector2();
+    Vector2 *posDown = new Vector2();
 
-    // Initialise the queue
-    Node *start_node = new Node(nullptr, start);
-    astar_queue.push(start_node);
-
-    Node *node = new Node();
+    // Initialise adjacency nodes
     Node *nodeUp = new Node();
     Node *nodeRight = new Node();
     Node *nodeLeft = new Node();
     Node *nodeDown = new Node();
 
-    while (!astar_queue.empty())
-    {
-        std::cout << "loop" << std::endl;
+    // Initialise the path
+    std::vector<Vector2 *> path;
 
+    // Initialise the queue
+    Node *start_node = new Node(0, start);
+    Node *node = new Node();
+
+    std::vector<Node *> potential_list;
+    potential_list.push_back(start_node);
+
+    while (!potential_list.empty())
+    {
         if (pauseForInput)
             cin.get();
 
+        // Iterate over every node in the list
+        float minCost = INFINITY;
+        std::cout << "potential_list" << std::endl;
+        int index = 0;
+        for (Node *n : potential_list)
+        {
+            float cost = calculateCost(n, goal);
+            std::cout << cost << std::endl;
+            Vector2::print(*n->getPos());
+            if (cost < minCost)
+            {
+                node = new Node(n->getPrev(), n->getPos());
+                minCost = cost;
+                break;
+            }
+            index++;
+        }
+
+        if (!suppressOutput)
+        {
+            Vector2::print(*node->getPos());
+        }
+
         // Points to the current node's position for convenience
-        pos = node->position;
+        pos = node->getPos();
 
-        // Iterate over every item in the queue
-        Node *front = astar_queue.front();
-        astar_queue.pop();
-        node->previous_node = front;
+        posUp = *(node->getPos()) + *UP;
+        posLeft = *(node->getPos()) + *LEFT;
+        posRight = *(node->getPos()) + *RIGHT;
+        posDown = *(node->getPos()) + *DOWN;
 
-        Vector2 *posUp = *(node->position) + *UP;
-        Vector2 *posLeft = *(node->position) + *LEFT;
-        Vector2 *posRight = *(node->position) + *RIGHT;
-        Vector2 *posDown = *(node->position) + *DOWN;
-
-        nodeUp->set(node, posUp);
-        nodeLeft->set(node, posLeft);
-        nodeRight->set(node, posRight);
-        nodeDown->set(node, posDown);
-
+        nodeUp->setPrev(node);
+        nodeUp->setPos(posUp);
+        nodeLeft->setPrev(node);
+        nodeLeft->setPos(posLeft);
+        nodeRight->setPrev(node);
+        nodeRight->setPos(posRight);
+        nodeDown->setPrev(node);
+        nodeDown->setPos(posDown);
+        
         // The distances are F = G + H
         // e.g. float distUp = dist_start + heuristic
-        float cost = calculateCost(node);
-        float distUp = cost + posUp->distTo(*goal);
+        float distUp = minCost + posUp->distTo(*goal);
         if (pos->y <= 0 || maze[calculatePosIndex(posUp)] == WALL)
             distUp = INFINITY;
-        float distLeft = cost + posLeft->distTo(*goal);
+        float distLeft = minCost + posLeft->distTo(*goal);
         if (pos->x <= 0 || maze[calculatePosIndex(posLeft)] == WALL)
             distLeft = INFINITY;
-        float distRight = cost + posRight->distTo(*goal);
+        float distRight = minCost + posRight->distTo(*goal);
         if (pos->x >= MAZE(COLS) - 1 || maze[calculatePosIndex(posRight)] == WALL)
             distRight = INFINITY;
-        float distDown = cost + posDown->distTo(*goal);
+        float distDown = minCost + posDown->distTo(*goal);
         if (pos->y >= MAZE(ROWS) - 1 || maze[calculatePosIndex(posDown)] == WALL)
             distDown = INFINITY;
 
-        std::vector<float> distances;
-        distances.push_back(distUp);
-        distances.push_back(distLeft);
-        distances.push_back(distRight);
-        distances.push_back(distDown);
+        // A boolean to store when all sides of this node are in potential nodes
+        // Hence we need to remove this node
+        bool fullyExplored = true;
+        if (distLeft != INFINITY)
+        {
+            if (!haveAnyNodesExplored(potential_list, posLeft))
+            {
+                potential_list.push_back(nodeLeft);
+                fullyExplored = false;
+            }
+        }
+        if (distRight != INFINITY)
+        {
+            if (!haveAnyNodesExplored(potential_list, posRight))
+            {
+                potential_list.push_back(nodeRight);
+                fullyExplored = false;
+            }
+        }
+        if (distUp != INFINITY)
+        {
+            if (!haveAnyNodesExplored(potential_list, posUp))
+            {
+                potential_list.push_back(nodeUp);
+                fullyExplored = false;
+            }
+        }
+        if (distDown != INFINITY)
+        {
+            if (!haveAnyNodesExplored(potential_list, posDown))
+            {
+                potential_list.push_back(nodeDown);
+                fullyExplored = false;
+            }
+        }
 
-        float min = *std::min_element(distances.begin(), distances.end());
-        
-        if (distLeft == min && distLeft != INFINITY)
-            astar_queue.push(nodeLeft);
-        
-        if (distRight == min && distRight != INFINITY)
-            astar_queue.push(nodeRight);
-
-        if (distUp == min && distDown != INFINITY)
-            astar_queue.push(nodeUp);
-
-        if (distDown == min && distDown != INFINITY)
-            astar_queue.push(nodeDown);
+        if (fullyExplored)
+        {
+            // Remove node at index
+            potential_list.erase(potential_list.begin() + index);
+            delete node;
+        }
 
         if (outputEveryCycle)
         {
-            Vector2::print(*pos);
-            bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
-            printMaze(maze, path, visited);
-            delete []visited;
+            path.clear();
+            Node *node_ptr = node;
+            while (node_ptr != 0)
+            {
+                path.push_back(node_ptr->getPos());
+                node_ptr = node_ptr->getPrev();
+            }
+            printMaze(maze, path, excluded);
         }
 
         if (*pos == *goal)
         {
             std::cout << "win" << std::endl;
+            break;
         }
-
-        delete posUp;
-        delete posLeft;
-        delete posRight;
-        delete posDown;
     }
 
-    delete node;
-    delete nodeUp;
-    delete nodeLeft;
-    delete nodeRight;
-    delete nodeDown;
-    delete pos;
+    std::cout << "end" << std::endl;
+
+    path.clear();
+    Node *node_ptr = node;
+    while (node_ptr != 0)
+    {
+        path.push_back(node_ptr->getPos());
+        node_ptr = node_ptr->getPrev();
+    }
+    node_ptr->~Node();
+
+    // Garbage collection
     delete UP;
     delete DOWN;
     delete LEFT;
     delete RIGHT;
     delete ZERO;
 
-    std::cout << "end" << std::endl;
+    delete nodeUp;
+    delete nodeDown;
+    delete nodeLeft;
+    delete nodeRight;
+
+    delete posUp;
+    delete posDown;
+    delete posLeft;
+    delete posRight;
 
     return std::make_tuple(path, loop_count);
 }
 
-float calculateCost(Node *node)
+float calculateCost(Node *node, Vector2 *goal)
 {
-    Node *node_ptr = node->previous_node;
+    Node *node_ptr = node->getPrev();
     float cost = 0;
-    while (node_ptr != nullptr)
+    while (node_ptr != 0)
     {
         cost++;
-        node_ptr = (Node*)node_ptr->previous_node;
-        Vector2::print(*(node_ptr->position));
+        node_ptr = node_ptr->getPrev();
+        //std::cout << "Cost" << cost << std::endl;
     }
+    cost += node->getPos()->distTo(*goal);
     return cost;
+}
+
+bool hasNodeExplored(Node *node, Vector2 *vec)
+{
+    Node *node_ptr = node;
+    while (node_ptr != 0)
+    {
+        if (*node_ptr->getPos() == *vec)
+            return true;
+        node_ptr = node_ptr->getPrev();
+    }
+    return false;
+}
+
+bool haveAnyNodesExplored(std::vector<Node *> nodes, Vector2 *vec)
+{
+    for (Node *node : nodes)
+    {
+        if (hasNodeExplored(node, vec))
+            return true;
+    }
+    return false;
 }

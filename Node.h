@@ -1,10 +1,16 @@
 #include "Vector2.h"
 
-struct Node
+class Node
 {
-    Node();
-    Node(Node *prev_node, Vector2 *pos);
+private:
     Node *previous_node;
     Vector2 *position;
-    void set(Node *prev_node, Vector2 *pos);
+public:
+    Node();
+    Node(Node *prev_node, Vector2 *pos);
+    ~Node();
+    Node *getPrev() const;
+    void setPrev(Node *prev);
+    Vector2 *getPos() const;
+    void setPos(Vector2 *pos);
 };
