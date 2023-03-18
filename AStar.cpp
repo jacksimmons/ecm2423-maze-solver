@@ -236,8 +236,6 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         }
     }
 
-    std::cout << float(clock() - c) / CLOCKS_PER_SEC << "s" << std::endl;
-
     Node *node_ptr = node;
     while (node_ptr != 0)
     {
