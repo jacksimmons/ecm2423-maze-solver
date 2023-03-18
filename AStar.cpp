@@ -107,6 +107,11 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         // Get current node
         node = potential_list.front();
 
+        // for (Node *n : potential_list)
+        // {
+        //     Vector2::print(*n->getPos());
+        // }
+
         // Points to the current node's position for convenience
         pos = node->getPos();
 
@@ -174,13 +179,26 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         }
 
         int sizeOfList = potential_list.size();
+
+        if (*pos == *goal)
+        {
+            break;
+        }
+
+        // Placed after goal checking, so that node doesn't get deleted on the final step
+        // This means the pushing into `path` can't involve getting the position of a freed
+        // pointer.
+        numNodes++;
+        // Remove node at the front
+        potential_list.pop_front();
+        explored_list.push_back(node->getPos());
+
         // Handle each direction to be added, delete the rest
         if (goingUp)
         {
             Node *next = new Node(node, posUp);
             potential_list.push_front(next);
             hierarchy_queue.push(next);
-            fullyExplored = false;
         }
         else
             delete posUp;
@@ -190,7 +208,6 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
             Node *next = new Node(node, posLeft);
             potential_list.push_front(next);
             hierarchy_queue.push(next);
-            fullyExplored = false;
         }
         else
             delete posLeft;
@@ -200,7 +217,6 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
             Node *next = new Node(node, posRight);
             potential_list.push_front(next);
             hierarchy_queue.push(next);
-            fullyExplored = false;
         }
         else
             delete posRight;
@@ -210,30 +226,13 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
             Node *next = new Node(node, posDown);
             potential_list.push_front(next);
             hierarchy_queue.push(next);
-            fullyExplored = false;
         }
         else
             delete posDown;
 
-        if (*pos == *goal)
-        {
-            break;
-        }
-
         // If a new element was added, do one iteration sort pass
         if (potential_list.size() != sizeOfList)
             potential_list = insertionSortByCost(potential_list, goal);
-        
-        // Placed after goal checking, so that node doesn't get deleted on the final step
-        // This means the pushing into `path` can't involve getting the position of a freed
-        // pointer.
-        if (fullyExplored)
-        {
-            numNodes++;
-            // Remove node at the front
-            potential_list.pop_front();
-            explored_list.push_back(node->getPos());
-        }
     }
 
     Node *node_ptr = node;

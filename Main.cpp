@@ -10,7 +10,7 @@ Vector2 *ZERO = new Vector2(0, 0);
 
 int main()
 {
-    // runDFS();
+    //runDFS();
     runAStar();
 
     delete UP;

@@ -246,13 +246,6 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
 
         if (outputEveryCycle)
             printMaze(maze, path, visited);
-
-        // An unexplainable error has occurred, exit
-        if (!maze[calculatePosIndex(pos)] == EMPTY)
-        {
-            std::cout << "Somehow visited a non-empty, non-wall node" << std::endl;
-            exit(1);
-        }
     }
 
     delete pos;
