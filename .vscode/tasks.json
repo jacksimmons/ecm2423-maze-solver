@@ -6,8 +6,8 @@
             "command": "C:\\Tools\\mingw64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
-                "-g",
                 "${workspaceFolder}\\*.cpp",
+                "-O3",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],

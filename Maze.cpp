@@ -8,8 +8,6 @@
 #include "Maze.h"
 #include "Vector2.h"
 
-using namespace std;
-
 // Convert the maze file into a char array
 // Also provides start and goal vectors
 std::tuple<char *, Vector2 *, Vector2 *> readMaze()
@@ -56,7 +54,7 @@ std::tuple<char *, Vector2 *, Vector2 *> readMaze()
 // Grey - Unvisited empty node
 // Red - Visited empty node
 // Green - Visited empty node, and in the path
-void printMaze(char* maze, std::vector<Vector2 *> path, bool* visited)
+void printMaze(char* maze, Path &path, bool* visited)
 {
     #ifdef _WIN32
     HANDLE hConsole;
@@ -102,8 +100,20 @@ void printMaze(char* maze, std::vector<Vector2 *> path, bool* visited)
     #endif
 }
 
+// printMaze for A* search, which doesn't store a visited array
+void printMaze(char* maze, Path &path)
+{
+    bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
+    for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
+    {
+        visited[i] = false;
+    }
+    printMaze(maze, path, visited);
+    delete[] visited;
+}
+
 // Get the ith element of the path, and return its vector form
-Vector2 *calculatePos(std::vector<Vector2 *> &path, int index)
+Vector2 *calculatePos(Path &path, int index)
 {
     Vector2 *pos = new Vector2();
     Vector2 *dir;

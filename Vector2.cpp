@@ -27,7 +27,7 @@ void Vector2::set(int _x, int _y)
 
 float Vector2::distTo(Vector2 v2)
 {
-    return sqrt(pow(x - v2.x, 2) + pow(y - v2.y, 2));
+    return abs(x - v2.x) + abs(y - v2.y);
 }
 
 bool Vector2::operator==(const Vector2 v2)

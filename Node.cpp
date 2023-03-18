@@ -12,15 +12,6 @@ Node::Node(Node *prev_node, Vector2 *pos)
     position = pos;
 }
 
-Node::~Node()
-{
-    Node *node_ptr = this;
-    if (node_ptr != 0)
-    {
-        node_ptr->getPrev()->~Node();
-    }
-}
-
 Node *Node::getPrev() const
 {
     return previous_node;
@@ -39,4 +30,11 @@ Vector2 *Node::getPos() const
 void Node::setPos(Vector2 *pos)
 {
     position = pos;
+}
+
+int Node::getSize()
+{
+    if (getPrev() == 0)
+        return 1;
+    return getPrev()->getSize() + 1;
 }
