@@ -3,7 +3,7 @@
 
 #define JOIN(a, b) a ## b
 // E_ = Easy, M_ = Medium, L_ = Large, VL_ = VLarge
-#define MAZE(suffix) JOIN(M_, suffix)
+#define MAZE(suffix) JOIN(E_, suffix)
 
 #include <vector>
 #include <tuple>

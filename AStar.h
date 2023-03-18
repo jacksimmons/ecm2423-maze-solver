@@ -9,8 +9,8 @@
 
 void runAStar();
 std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze);
-std::deque<Node *> insertionSortByCost(std::deque<Node *> &list, Vector2 *goal);
-float calculateCost(Node *node, Vector2 *goal);
+std::deque<std::tuple<Node *, int>> insertionSortByCost(std::deque<std::tuple<Node *, int>> &list, Vector2 *goal);
+int calculateCost(Node *node, Vector2 *goal);
 bool isNodeParentOf(Node *potential_parent, Node *potential_child);
 bool isAnyNodeParentOf(std::deque<Node *> &nodes, Node *node);
 bool hasNodeExplored(Node *node, Vector2 *vec);

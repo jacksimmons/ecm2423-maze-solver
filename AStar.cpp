@@ -88,14 +88,14 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
     Path path;
 
     // Initialise the list of potential nodes
-    std::deque<Node *> potential_list;
+    std::deque<std::tuple<Node *, int>> potential_list;
     std::queue<Node *> hierarchy_queue;
     Path explored_list;
 
     Node *node = new Node();
     node->setPos(start);
     
-    potential_list.push_front(node);
+    potential_list.push_front(std::make_tuple(node, 0));
 
     while (!potential_list.empty())
     {
@@ -105,7 +105,7 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
             cin.get();
 
         // Get current node
-        node = potential_list.front();
+        node = std::get<0>(potential_list.front());
 
         // for (Node *n : potential_list)
         // {
@@ -159,22 +159,22 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         // Calculate which directions need to be added to the potential_list (<10%)
         if (distLeft != INFINITY)
         {
-            if (!haveAnyNodesExplored(potential_list, posLeft) && !isPosInVector(posLeft, explored_list))
+            if (!hasNodeExplored(node, posLeft) && !isPosInVector(posLeft, explored_list))
                 goingLeft = true;
         }
         if (distRight != INFINITY)
         {
-            if (!haveAnyNodesExplored(potential_list, posRight) && !isPosInVector(posRight, explored_list))
+            if (!hasNodeExplored(node, posRight) && !isPosInVector(posRight, explored_list))
                 goingRight = true;
         }
         if (distUp != INFINITY)
         {
-            if (!haveAnyNodesExplored(potential_list, posUp) && !isPosInVector(posUp, explored_list))
+            if (!hasNodeExplored(node, posUp) && !isPosInVector(posUp, explored_list))
                 goingUp = true;
         }
         if (distDown != INFINITY)
         {
-            if (!haveAnyNodesExplored(potential_list, posDown) && !isPosInVector(posDown, explored_list))
+            if (!hasNodeExplored(node, posDown) && !isPosInVector(posDown, explored_list))
                 goingDown = true;
         }
 
@@ -197,7 +197,7 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         if (goingUp)
         {
             Node *next = new Node(node, posUp);
-            potential_list.push_front(next);
+            potential_list.push_front(std::make_tuple(next, calculateCost(next, goal)));
             hierarchy_queue.push(next);
         }
         else
@@ -206,7 +206,7 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         if (goingLeft)
         {
             Node *next = new Node(node, posLeft);
-            potential_list.push_front(next);
+            potential_list.push_front(std::make_tuple(next, calculateCost(next, goal)));
             hierarchy_queue.push(next);
         }
         else
@@ -215,7 +215,7 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         if (goingRight)
         {
             Node *next = new Node(node, posRight);
-            potential_list.push_front(next);
+            potential_list.push_front(std::make_tuple(next, calculateCost(next, goal)));
             hierarchy_queue.push(next);
         }
         else
@@ -224,7 +224,7 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         if (goingDown)
         {
             Node *next = new Node(node, posDown);
-            potential_list.push_front(next);
+            potential_list.push_front(std::make_tuple(next, calculateCost(next, goal)));
             hierarchy_queue.push(next);
         }
         else
@@ -265,32 +265,31 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
     return std::make_tuple(path, loop_count, numNodes);
 }
 
-std::deque<Node *> insertionSortByCost(std::deque<Node *> &list, Vector2 *goal)
+std::deque<std::tuple<Node *, int>> insertionSortByCost(std::deque<std::tuple<Node *, int>> &list, Vector2 *goal)
 {
-    Node *new_node = list.front();
+    std::tuple<Node *, int> pair = list.front();
+    Node *new_node = std::get<0>(pair);
+    int cost = std::get<1>(pair);
     list.pop_front();
-    float cost = calculateCost(new_node, goal);
+
     int index = 0;
-    bool inserted = false;
     for (int i = 0; i < list.size() - 1; i++)
     {
-        if (cost > calculateCost(list[i], goal))
+        if (cost > std::get<1>(list[i]))
         {
             continue;
         }
         else
         {
-            inserted = true;
-            list.insert(list.begin() + i, new_node);
-            break;
+            list.insert(list.begin() + i, pair);
+            return list;
         }
     }
-    if (!inserted)
-        list.push_back(new_node);
+    list.push_back(pair);
     return list;
 }
 
-float calculateCost(Node *node, Vector2 *goal)
+int calculateCost(Node *node, Vector2 *goal)
 {
     return node->getSize() + node->getPos()->distTo(*goal);
 }
