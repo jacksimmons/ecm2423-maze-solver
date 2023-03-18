@@ -30,6 +30,7 @@ void runAStar()
     start = std::get<1>(mazeInfo);
     goal = std::get<2>(mazeInfo);
 
+    // Output the start and end of the maze
     std::cout << "Start: " << std::endl;
     Vector2::print(*start);
     std::cout << "Goal: " << std::endl;
@@ -107,11 +108,6 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         // Get current node
         node = std::get<0>(potential_list.front());
 
-        // for (Node *n : potential_list)
-        // {
-        //     Vector2::print(*n->getPos());
-        // }
-
         // Points to the current node's position for convenience
         pos = node->getPos();
 
@@ -128,24 +124,23 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
 
         // The distances are F = G + H
         // e.g. float distUp = dist_start + heuristic
-
         // Try each of the directions costs from current node
         node->setPos(posUp);
-        float distUp = calculateCost(node, goal);
-        if (pos->y <= 0 || maze[calculatePosIndex(posUp)] == WALL)
-            distUp = INFINITY;
+        float distUp = INFINITY;
+        if (!(pos->y <= 0 || maze[calculatePosIndex(posUp)] == WALL))
+            distUp = calculateCost(node, goal);
         node->setPos(posLeft);
-        float distLeft = calculateCost(node, goal);
-        if (pos->x <= 0 || maze[calculatePosIndex(posLeft)] == WALL)
-            distLeft = INFINITY;
+        float distLeft = INFINITY;
+        if (!(pos->x <= 0 || maze[calculatePosIndex(posLeft)] == WALL))
+            distLeft = calculateCost(node, goal);
         node->setPos(posRight);
-        float distRight = calculateCost(node, goal);
-        if (pos->x >= MAZE(COLS) - 1 || maze[calculatePosIndex(posRight)] == WALL)
-            distRight = INFINITY;
+        float distRight = INFINITY;
+        if (!(pos->x >= MAZE(COLS) - 1 || maze[calculatePosIndex(posRight)] == WALL))
+            distRight = calculateCost(node, goal);
         node->setPos(posDown);
-        float distDown = calculateCost(node, goal);
-        if (pos->y >= MAZE(ROWS) - 1 || maze[calculatePosIndex(posDown)] == WALL)
-            distDown = INFINITY;
+        float distDown = INFINITY;
+        if (!(pos->y >= MAZE(ROWS) - 1 || maze[calculatePosIndex(posDown)] == WALL))
+            distDown = calculateCost(node, goal);
         
         // Set the position back
         node->setPos(pos);
