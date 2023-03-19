@@ -9,31 +9,25 @@ To run:
 To change which maze to solve, go into "Maze.h", and edit the MAZE preprocessor definition:
 #define MAZE(suffix) JOIN({maze size}_, suffix)
 
+Change the above line (Maze.h:6) to any of the following:
+
 #define MAZE(suffix) JOIN(E_, suffix) // Easy
 #define MAZE(suffix) JOIN(M_, suffix) // Medium
 #define MAZE(suffix) JOIN(L_, suffix) // Large
 #define MAZE(suffix) JOIN(VL_, suffix) // VLarge
 
-In Main.cpp:
-To run both algorithms, change nothing.
-To run only DFS, comment out the "runAStar" line (runAStar(); -> //runAStar();)
-To run only A*, comment out the "runDFS" line (runDFS(); -> //runDFS();)
+Now in Main.cpp:
+To run both algorithms, change nothing (note that as A* happens after, only the A* output will be written
+to PathOutput.txt)
+To run only DFS, comment out just the "runAStar" line (runAStar(); -> //runAStar();)
+To run only A*, comment out just the "runDFS" line (runDFS(); -> //runDFS();)
 This is explained further under Depth First Search: and A* Search:
 
-Then run the following commands:
-1. g++ *.cpp -O3 -o a.out
-2. ./a.out
-(The command line argument -O3 is an optional optimisation flag which leads to faster execution)
-
-
-Settings:
-At the top of the DFS and A* algorithm source files (DFS.cpp, AStar.cpp), there are const bool values which act as settings.
-The most important of which to change are:
-`pauseForInput`, `outputEveryCycle`, `suppressFinalDiagram`
-Note that outputEveryCycle should only be true on the Easy/Medium mazes, as the printMaze procedure is computationally expensive, especially
-to use every cycle.
-Note that suppressFinalDiagram shouldn't be false on the Very Large maze, as it won't fit in the terminal and is computationally expensive.
-pauseForInput is also not advised for bigger mazes, as there can be millions of cycles in these algorithms.
+Now run the following commands:
+1. g++ *.cpp -O3 -flto -o a.exe
+2. ./a.exe
+(The command line arguments -O3 and -flto are optional optimisation flags which lead to faster execution)
+(These are only necessary for the VLarge maze)
 
 
 Depth-First Search:
@@ -47,4 +41,10 @@ A* Search:
 
 In Main.cpp, to just run A*, call the procedure runAStar() {void runAStar()} after including "AStar.h"
 This A* operates by storing new Node objects which link back to the previous nodes.
-This less efficient approach was neccessary as A* compares paths, while DFS just attempts to find one by depth.
+This less efficient approach was neccessary as A* compares paths by cost, while DFS just looks by depth.
+
+
+Performance:
+
+To improve performance, you can disable outputMaze in "Constants.h".
+However, this change will only have a major impact on the Very Large maze. (4.749s -> 51.577s)

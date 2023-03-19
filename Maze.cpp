@@ -130,3 +130,62 @@ int calculatePosIndex(Vector2 *pos)
 {
     return (pos->y) * MAZE(COLS) + pos->x;
 }
+
+void outputPathToFile(string header, Path path)
+{
+    string fileName = "PathOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+    file << header << std::endl;
+    for (int i = path.size() - 1; i >= 0; i--)
+    {
+        file << "(" << path[i]->x << ", " << path[i]->y << ")" << std::endl;
+    }
+    file.close();
+}
+
+void outputMazeToFile(char *maze, Path &path, bool *visited)
+{
+    string fileName = "MazeOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+    for (int i = 0; i < MAZE(ROWS); i++)
+    {
+        for (int j = 0; j < MAZE(COLS); j++)
+        {
+            char c = '-';
+            Vector2 *pos = new Vector2(j, i);
+            if (maze[i * MAZE(COLS) + j] == WALL)
+                c = '#';
+            else
+            {
+                if (visited[i * MAZE(COLS) + j])
+                    c = 'v';
+                else
+                    c = '-';
+
+                for (int i = 0; i < path.size(); i++)
+                {
+                    if (*pos == *path[i])
+                    {
+                        c = '*';
+                    }
+                }
+            }
+            delete pos;
+            // Output the character c
+            file << c;
+        }
+        // Newline for next row
+        file << std::endl;
+    }
+    file.close();
+}
+
+void outputMazeToFile(char *maze, Path &path)
+{
+    bool *visited = new bool[MAZE(COLS) * MAZE(ROWS)];
+    for (int i = 0; i < MAZE(COLS) * MAZE(ROWS); i++)
+        visited[i] = false;
+    outputMazeToFile(maze, path, visited);
+}

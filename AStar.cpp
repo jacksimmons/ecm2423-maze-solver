@@ -42,22 +42,10 @@ void runAStar()
     int loop_count = std::get<1>(pathData);
     int numNodes = std::get<2>(pathData);
 
-    // Final diagram output
-    if (!suppressFinalDiagram)
-    {
-        printMaze(maze, finalPath);
-    }
-
     // OUTPUT PATH TO FILE
-    string fileName = "PathOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
-    file << "--- A* SEARCH " << MAZE(SIZE) << " [" << MAZE(FILENAME) << "] ---" << std::endl;
-    for (int i = finalPath.size() - 1; i >= 0; i--)
-    {
-        file << "(" << finalPath[i]->x << ", " << finalPath[i]->y << ")" << std::endl;
-    }
-    file.close();
+    outputPathToFile("--- A* SEARCH " + std::string(MAZE(NAME)) + " [" + MAZE(FILENAME) + "] ---", finalPath);
+    if (outputMaze)
+        outputMazeToFile(maze, finalPath);
 
     // Execution statistics
     std::cout << "Number of nodes visited: " << numNodes << endl;
@@ -102,19 +90,11 @@ std::tuple<Path, int, int> astar(Vector2 *start, Vector2 *goal, char* maze)
     {
         loop_count++;
 
-        if (pauseForInput)
-            cin.get();
-
         // Get current node
         node = std::get<0>(potential_list.front());
 
         // Points to the current node's position for convenience
         pos = node->getPos();
-
-        if (!suppressOutput)
-        {
-            Vector2::print(*pos);
-        }
 
         // Create position vectors for all cardinal directions
         Vector2 *posUp = *pos + *UP;

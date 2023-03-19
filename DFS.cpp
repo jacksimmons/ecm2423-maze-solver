@@ -42,18 +42,24 @@ void runDFS()
 
     // Complete the search
     std::tuple<std::vector<Vector2 *>, int> pathInfo = dfs(start, goal, maze, visited);
-    std::vector<Vector2 *> finalPath = std::get<0>(pathInfo);
+    std::vector<Vector2 *> directionPath = std::get<0>(pathInfo);
     int loop_count = std::get<1>(pathInfo);
 
+    std::vector<Vector2 *> finalPath;
+
     // Final path output
-    cout << "Final path: " << std::endl;
-    for (int i = 0; i < finalPath.size(); i++)
+    for (int i = directionPath.size()-1; i >= 0; i--)
     {
         // Calculate the position of the ith element in the path
-        Vector2 *calcPos = calculatePos(finalPath, i);
-        Vector2::print(*calcPos);
-        delete calcPos;
+        Vector2 *calcPos = calculatePos(directionPath, i);
+        finalPath.push_back(calcPos);
     }
+
+    outputPathToFile("--- DFS SEARCH " + std::string(MAZE(NAME)) + " [" + MAZE(FILENAME) + "] ---", finalPath);
+    if (outputMaze)
+        outputMazeToFile(maze, finalPath, visited);
+    for (Vector2 *vec : finalPath)
+        delete vec;
     
     // Calculate the number of visited nodes
     int numNodes = 0;
@@ -102,9 +108,6 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
     {
         loop_count++;
 
-        if (pauseForInput)
-            cin.get();
-
         // Check if the direction has been assigned, if not calculate it
         if (Vector2::isZero(*direction))
         {
@@ -136,16 +139,11 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
                 // No direction has been assigned, and none are possible (or beneficial), so we backtrack until one is found.
                 // This is the BREADTH part of the search (Depth first, then Breadth)
                 selectedDir = ZERO;
-                if (!suppressOutput)
-                    std::cout << "No directions are possible... backtracking" << std::endl;
                 visited[calculatePosIndex(pos)] = true;
 
                 // Backtracking, so remove most recent node
                 dfs_stack.pop();
                 path.pop_back();
-
-                if (outputEveryCycle)
-                    printMaze(maze, path, visited);
             }
             
             // The direction has been set, need to restart block
@@ -161,8 +159,6 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
         }
         else
         {
-            if (!suppressOutput)
-                std::cout << "Going along direction for depth..." << std::endl;
             // A proper direction has been assigned, so check if that direction leads into a wall, backtrack if so
             // This is the DEPTH part; a direction has been assigned, and we travel along it until a wall is reached, where the direction is removed.
             // When the direction is removed, the above block (BREADTH and BACKTRACKING) begins
@@ -203,14 +199,9 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
                         dfs_stack.push(DOWN);
                         path.push_back(DOWN);
                     }
-
-                    if (outputEveryCycle)
-                        printMaze(maze, path, visited);
                 }
                 else
                 {
-                    if (!suppressOutput)
-                        std::cout << "Calculating new direction..." << std::endl;
                     direction->set(0, 0);
                     continue;
                 }
@@ -222,30 +213,12 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
                 // This is because the only place to go from the goal is out of bounds
                 if (*pos == *goal)
                 {
-                    if (!suppressFinalDiagram)
-                        printMaze(maze, path, visited);
                     std::cout << "Found the goal!" << std::endl;
                     delete posPlusDirection;
                     break;
                 }
             }
         }
-
-        // Output for the path, adjacent node position and value, and the map at the end of every cycle
-        if (!suppressOutput)
-        {
-            std::cout << "Path: " << std::endl;
-            for (Vector2 *vec : path)
-            {
-                Vector2::print(*vec);
-            }
-            std::cout << "Pos: " << std::endl;
-            Vector2::print(*pos);
-            std::cout << "'" << maze[calculatePosIndex(pos)] << "'" << std::endl;
-        }
-
-        if (outputEveryCycle)
-            printMaze(maze, path, visited);
     }
 
     delete pos;

@@ -25,7 +25,7 @@ void Vector2::set(int _x, int _y)
     y = _y;
 }
 
-float Vector2::distTo(Vector2 v2)
+int Vector2::distTo(Vector2 v2)
 {
     return abs(x - v2.x) + abs(y - v2.y);
 }
