@@ -12,7 +12,7 @@
 // Example: MAZE(NAME) = JOIN({maze_type}_, NAME) = {maze_type}_NAME
 #define JOIN(a, b) a ## b
 // E_ = Easy, M_ = Medium, L_ = Large, VL_ = VLarge
-#define MAZE(suffix) JOIN(VL_, suffix)
+#define MAZE(suffix) JOIN(E_, suffix)
 
 // Define the maze macros
 #define E_COLS 20

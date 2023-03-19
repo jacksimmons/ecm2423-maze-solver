@@ -9,8 +9,6 @@ To run:
 To change which maze to solve, go into "Maze.h", and edit the MAZE preprocessor definition:
 #define MAZE(suffix) JOIN({maze size}_, suffix)
 
-Change the above line (Maze.h:6) to any of the following:
-
 #define MAZE(suffix) JOIN(E_, suffix) // Easy
 #define MAZE(suffix) JOIN(M_, suffix) // Medium
 #define MAZE(suffix) JOIN(L_, suffix) // Large
