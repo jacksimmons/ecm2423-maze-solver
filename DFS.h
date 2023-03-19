@@ -1,6 +1,9 @@
 #include <vector>
 #include <tuple>
-#include "Vector2.h"
 
+#include "Vector2.h"
+#include "Maze.h"
+
+// Function templates
 void runDFS();
-std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited);
+Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited);

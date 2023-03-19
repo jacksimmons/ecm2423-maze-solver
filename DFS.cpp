@@ -1,12 +1,13 @@
+// Commented fully
 #include <fstream>
 #include <algorithm>
 #include <ctime>
 #include <stack>
 
-#include "Maze.h"
 #include "DFS.h"
 #include "Constants.h"
 
+// Commented
 void runDFS()
 {
     // Create a clock to measure runtime speed
@@ -30,24 +31,25 @@ void runDFS()
     Vector2 *goal;
 
     // Read the vectors from the read maze
-    tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
+    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
     maze = std::get<0>(mazeInfo);
     start = std::get<1>(mazeInfo);
     goal = std::get<2>(mazeInfo);
 
+    // Output start and goal positions
     std::cout << "Start: " << std::endl;
     Vector2::print(*start);
     std::cout << "Goal: " << std::endl;
     Vector2::print(*goal);
 
-    // Complete the search
-    std::tuple<std::vector<Vector2 *>, int> pathInfo = dfs(start, goal, maze, visited);
-    std::vector<Vector2 *> directionPath = std::get<0>(pathInfo);
-    int loop_count = std::get<1>(pathInfo);
+    // Complete the search, and get the output from it
+    Path directionPath = dfs(start, goal, maze, visited);
 
     std::vector<Vector2 *> finalPath;
 
-    // Final path output
+    // directionPath contains the start position, followed by a series of directions.
+    // The sum of all directions up to index i gives the intended position at that index.
+    // Final path output (converting a vector of cardinal directions into one of positions)
     for (int i = directionPath.size()-1; i >= 0; i--)
     {
         // Calculate the position of the ith element in the path
@@ -55,9 +57,12 @@ void runDFS()
         finalPath.push_back(calcPos);
     }
 
+    // File output
     outputPathToFile("--- DFS SEARCH " + std::string(MAZE(NAME)) + " [" + MAZE(FILENAME) + "] ---", finalPath);
     if (outputMaze)
         outputMazeToFile(maze, finalPath, visited);
+    
+    // Garbage collection for positions
     for (Vector2 *vec : finalPath)
         delete vec;
     
@@ -75,7 +80,6 @@ void runDFS()
     std::cout << "Number of nodes visited: " << numNodes << std::endl;
     std::cout << "Number of steps in final path: " << finalPath.size() << std::endl;
     std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << std::endl;
-    std::cout << "Loop count: " << loop_count << std::endl;
 
     // Garbage collection
     delete start;
@@ -85,11 +89,10 @@ void runDFS()
     delete[] visited;
 }
 
-std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
+// Commented
+Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
 {
-    // Stores how many times the algorithm has been entered
-    int loop_count = 0;
-
+    // Mark starting node as visited as we start here
     visited[calculatePosIndex(start)] = true;
 
     // Initialise direction and pos
@@ -97,7 +100,7 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
     Vector2 *pos = new Vector2(start->x, start->y); // Copy start into pos
 
     // Initialise the path
-    std::vector<Vector2 *> path;
+    Path path;
     path.push_back(start);
 
     // Initialise the dfs stack
@@ -106,8 +109,6 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
 
     while (!dfs_stack.empty())
     {
-        loop_count++;
-
         // Check if the direction has been assigned, if not calculate it
         if (Vector2::isZero(*direction))
         {
@@ -178,7 +179,7 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
                     pos->set(pos->x + direction->x, pos->y + direction->y);
                     visited[calculatePosIndex(pos)] = true;
 
-                    // Add a pointer to the right direction to the path
+                    // Add a pointer to the correct direction to the path
                     if (*direction == *LEFT)
                     {
                         dfs_stack.push(LEFT);
@@ -224,5 +225,5 @@ std::tuple<std::vector<Vector2 *>, int> dfs(Vector2 *start, Vector2 *goal, char*
     delete pos;
     delete direction;
 
-    return std::make_tuple(path, loop_count);
+    return path;
 }

@@ -1,18 +1,19 @@
 #ifndef VEC2_H
-#define VEC2_H
+#define VEC2_H 1
 
 #include <iostream>
-#include <fstream>
-
-using namespace std;
 
 struct Vector2
 {
+    // Members
     int x;
     int y;
 
+    // Constructor templates
     Vector2();
     Vector2(int _x, int _y);
+
+    // Method templates
     void set(int _x, int _y);
     int distTo(Vector2 vec);
     bool operator==(const Vector2 vec);
@@ -21,6 +22,7 @@ struct Vector2
     Vector2 *operator+(const Vector2 vec);
     Vector2 *operator-(const Vector2 vec);
 
+    // Static methods
     static bool isZero(Vector2 v2)
     {
         return v2.x == 0 && v2.y == 0;

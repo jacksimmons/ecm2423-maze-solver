@@ -1,9 +1,6 @@
+// Commented fully
 #include <fstream>
 #include <tuple>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include "Maze.h"
 #include "Vector2.h"
@@ -12,15 +9,15 @@
 // Also provides start and goal vectors
 std::tuple<char *, Vector2 *, Vector2 *> readMaze()
 {
-    //*maze needs to be freed in calling block
     char *maze = new char[MAZE(ROWS) * MAZE(COLS)];
     Vector2 *start = new Vector2();
     Vector2 *goal = new Vector2();
 
     // Create input file stream
-    ifstream fin;
+    std::ifstream fin;
     fin.open(MAZE(FILENAME));
 
+    // Iterate over the entire file, putting it into an array
     for (int i = 0; i < MAZE(ROWS); i++)
     {
         for (int j = 0; j < MAZE(COLS); j++)
@@ -29,12 +26,16 @@ std::tuple<char *, Vector2 *, Vector2 *> readMaze()
             fin >> c;
             maze[i * MAZE(COLS) + j] = c;
 
+            // If we're on the first row, and there is an empty node
+            // Then this must be the start node
             if (i == 0 && c == EMPTY)
             {
                 start->x = j;
                 start->y = i;
             }
 
+            // If we're on the final row, and there is an empty node
+            // Then this must be the goal node
             else if (i == MAZE(ROWS) - 1 && c == EMPTY)
             {
                 goal->x = j;
@@ -43,73 +44,10 @@ std::tuple<char *, Vector2 *, Vector2 *> readMaze()
         }
     }
 
-    // Input into maze 2D arr
+    // Close the file
     fin.close();
 
     return std::make_tuple(maze, start, goal);
-}
-
-// Print the maze in console, with colour coding:
-// Blue - Wall node
-// Grey - Unvisited empty node
-// Red - Visited empty node
-// Green - Visited empty node, and in the path
-void printMaze(char* maze, Path &path, bool* visited)
-{
-    #ifdef _WIN32
-    HANDLE hConsole;
-    int c = 0;
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    for (int i = 0; i < MAZE(ROWS); i++)
-    {
-        for (int j = 0; j < MAZE(COLS); j++)
-        {
-            Vector2 *pos = new Vector2(j, i);
-            if (maze[i * MAZE(COLS) + j] == WALL)
-                c = 9; // Blue, for all walls
-            else
-            {
-                if (visited[i * MAZE(COLS) + j])
-                    c = 12; // Red, for all visited nodes not on the path (they have been excluded)
-                else
-                    c = 0; // Grey, for all unvisited nodes
-
-                for (int i = 0; i < path.size(); i++)
-                {
-                    Vector2 *calcedPos = calculatePos(path, i);
-                    if (*pos == *calcedPos)
-                    {
-                        c = 10; // Lime, for all nodes on the path
-                    }
-                    delete calcedPos;
-                }
-            }
-            delete pos;
-            
-            // Set the colour of the console for this char only
-            SetConsoleTextAttribute(hConsole, c);
-            std::cout << maze[i * MAZE(COLS) + j];
-        }
-        //.Newline for next row
-        std::cout << std::endl;
-    }
-
-    // Reset colour for other output later on
-    SetConsoleTextAttribute(hConsole, 0);
-    #endif
-}
-
-// printMaze for A* search, which doesn't store a visited array
-void printMaze(char* maze, Path &path)
-{
-    bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
-    for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
-    {
-        visited[i] = false;
-    }
-    printMaze(maze, path, visited);
-    delete[] visited;
 }
 
 // Get the ith element of the path, and return its vector form
@@ -125,18 +63,20 @@ Vector2 *calculatePos(Path &path, int index)
     return pos;
 }
 
-// Convert vector to index
+// Convert vector to index of maze array
 int calculatePosIndex(Vector2 *pos)
 {
     return (pos->y) * MAZE(COLS) + pos->x;
 }
 
-void outputPathToFile(string header, Path path)
+// Output the path to PathOutput.txt
+void outputPathToFile(std::string header, Path path)
 {
-    string fileName = "PathOutput.txt";
+    std::string fileName = "PathOutput.txt";
     std::ofstream file;
     file.open(fileName);
     file << header << std::endl;
+    // Print each position in (x,y) format
     for (int i = path.size() - 1; i >= 0; i--)
     {
         file << "(" << path[i]->x << ", " << path[i]->y << ")" << std::endl;
@@ -146,24 +86,29 @@ void outputPathToFile(string header, Path path)
 
 void outputMazeToFile(char *maze, Path &path, bool *visited)
 {
-    string fileName = "MazeOutput.txt";
+    std::string fileName = "MazeOutput.txt";
     std::ofstream file;
     file.open(fileName);
+
+    // Iterate over every character in the maze array
     for (int i = 0; i < MAZE(ROWS); i++)
     {
         for (int j = 0; j < MAZE(COLS); j++)
         {
+            // Empty by default
             char c = '-';
             Vector2 *pos = new Vector2(j, i);
             if (maze[i * MAZE(COLS) + j] == WALL)
                 c = '#';
             else
             {
+                // Visited nodes marked v
                 if (visited[i * MAZE(COLS) + j])
                     c = 'v';
                 else
                     c = '-';
 
+                // Overwrite the above if on the path with *
                 for (int i = 0; i < path.size(); i++)
                 {
                     if (*pos == *path[i])
@@ -173,7 +118,7 @@ void outputMazeToFile(char *maze, Path &path, bool *visited)
                 }
             }
             delete pos;
-            // Output the character c
+            // Output the character c to file
             file << c;
         }
         // Newline for next row
@@ -182,10 +127,13 @@ void outputMazeToFile(char *maze, Path &path, bool *visited)
     file.close();
 }
 
+// Output maze when a visited array is not present
 void outputMazeToFile(char *maze, Path &path)
 {
+    // Make new visited array and fill it with false
     bool *visited = new bool[MAZE(COLS) * MAZE(ROWS)];
     for (int i = 0; i < MAZE(COLS) * MAZE(ROWS); i++)
         visited[i] = false;
     outputMazeToFile(maze, path, visited);
+    delete[] visited;
 }

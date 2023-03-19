@@ -48,3 +48,21 @@ Performance:
 
 To improve performance, you can disable outputMaze in "Constants.h".
 However, this change will only have a major impact on the Very Large maze. (4.749s -> 51.577s)
+
+
+Coordinate System:
+
+I used a 2D cartesian coordinate system to represent the position of each node. (0, 0) represents the 0th row and 0th column.
+(0, 1) would represent the 1st row and 0th column.
+The x-coordinate represents the column, and the y-coordinate represents the row.
+
+
+Maze Output:
+
+There are 2 forms of output: PathOutput.txt and MazeOutput.txt
+PathOutput.txt is an ordered list of positions making up the path from the start to the goal (cartesian coordinates)
+MazeOutput.txt is the explored maze outputted in visual form, with the following key:
+    v = Visited node (DFS only) which isn't on the path
+    * = Node on the path
+    - = Unvisited node
+    # = Wall

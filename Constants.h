@@ -1,5 +1,8 @@
+// Commented fully
 #include "Vector2.h"
 
+// Outputs to MazeOutput.txt the explored path, with notation explained in README.txt.
+// Setting this to false disables this output.
 const bool outputMaze = true;
 
 // These are the cardinal directions (and zero vector), used in both search algorithms for convenience.
