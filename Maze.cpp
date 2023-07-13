@@ -2,8 +2,8 @@
 #include <fstream>
 #include <tuple>
 
-#include "Maze.h"
-#include "Vector2.h"
+#include "Maze.hpp"
+#include "Vector2.hpp"
 
 
 // Convert the maze file into a char array

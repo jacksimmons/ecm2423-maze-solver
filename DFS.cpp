@@ -4,8 +4,8 @@
 #include <ctime>
 #include <stack>
 
-#include "DFS.h"
-#include "Constants.h"
+#include "DFS.hpp"
+#include "Constants.hpp"
 
 // Commented
 void runDFS(char mazeType, bool outputMaze)

@@ -3,10 +3,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "Main.h"
-#include "AStar.h"
-#include "DFS.h"
-#include "Constants.h"
+#include "Main.hpp"
+#include "AStar.hpp"
+#include "DFS.hpp"
+#include "Constants.hpp"
 
 // Assign to the externs in Constants.h
 Vector2 *LEFT = new Vector2(-1, 0);
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 {
 	char maze = 'E';
 	bool dfs = true;
-	unsigned int iterations = 1;
+	int iterations = 1;
 	bool outputMaze = true;
 	try
 	{
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 		{
 			int iters = std::stoi(argv[3]);
 			if (iters > 0)
-				iterations = (unsigned int)iters;
+				iterations = iters;
 			else
 				throw 3;
 		}
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 	std::cout << "Average time taken for one to execute: " << timeTaken.count() / iterations << "s" << std::endl;
 }
 
-void runSolver(char mazeType, bool dfs, unsigned int N, bool outputMaze)
+void runSolver(char mazeType, bool dfs, int N, bool outputMaze)
 {
 	if (dfs)
 	{

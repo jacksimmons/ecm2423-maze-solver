@@ -1,4 +1,4 @@
-#include "Vector2.h"
+#include "Vector2.hpp"
 #include <math.h>
 
 // Vector2 stands for 2D vector (x and y components)
@@ -25,9 +25,9 @@ void Vector2::set(int _x, int _y)
     y = _y;
 }
 
-int Vector2::distTo(Vector2 v2)
+int Vector2::distTo(Vector2 *v2)
 {
-    return abs(x - v2.x) + abs(y - v2.y);
+    return abs(x - v2->x) + abs(y - v2->y);
 }
 
 bool Vector2::operator==(const Vector2 v2)

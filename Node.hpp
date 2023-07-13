@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-#include "Vector2.h"
+#include "Vector2.hpp"
 
 // Node class template
 class Node
@@ -11,7 +11,7 @@ private:
     Vector2 *position;
 public:
     // Constructors
-    Node();
+	Node();
     Node(Node *prev_node, Vector2 *pos);
 
     // Methods

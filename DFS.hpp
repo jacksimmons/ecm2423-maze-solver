@@ -1,8 +1,8 @@
 #include <vector>
 #include <tuple>
 
-#include "Vector2.h"
-#include "Maze.h"
+#include "Vector2.hpp"
+#include "Maze.hpp"
 
 // Function templates
 void runDFS(char, bool);

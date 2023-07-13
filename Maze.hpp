@@ -6,7 +6,7 @@
 #include <tuple>
 #include <string>
 
-#include "Vector2.h"
+#include "Vector2.hpp"
 
 // Define the maze macros
 #define E_COLS 20

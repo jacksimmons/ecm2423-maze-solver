@@ -15,7 +15,7 @@ struct Vector2
 
     // Method templates
     void set(int _x, int _y);
-    int distTo(Vector2 vec);
+    int distTo(Vector2 *vec);
     bool operator==(const Vector2 vec);
     bool operator!=(const Vector2 vec);
     void operator+=(const Vector2 vec);

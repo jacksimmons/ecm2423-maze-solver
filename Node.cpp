@@ -1,9 +1,9 @@
-#include "Node.h"
+#include "Node.hpp"
 
 Node::Node()
 {
-    previous_node = 0;
-    position = new Vector2();
+	previous_node = NULL;
+	position = new Vector2();
 }
 
 Node::Node(Node *prev_node, Vector2 *pos)

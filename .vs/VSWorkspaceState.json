@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\mazes",
+    "\\MazeSolver",
+    "\\MazeSolver\\MazeSolver",
+    "\\stats"
   ],
-  "SelectedNode": "\\Main.cpp",
+  "SelectedNode": "\\MazeSolver\\MazeSolver.sln",
   "PreviewInSolutionExplorer": false
 }

@@ -1,5 +1,5 @@
 // Commented fully
-#include "Vector2.h"
+#include "Vector2.hpp"
 
 // These are the cardinal directions (and zero vector), used in both search algorithms for convenience.
 // They are `extern` meaning they are defined elsewhere, and that is in Main.cpp.
