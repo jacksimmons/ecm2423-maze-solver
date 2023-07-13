@@ -1,4 +1,3 @@
-// Commented fully
 #include <vector>
 #include <deque>
 #include <tuple>

@@ -1,4 +1,3 @@
-// Commented fully
 #include <fstream>
 #include <algorithm>
 #include <ctime>
@@ -35,9 +34,9 @@ void runDFS(char mazeType, bool outputMaze)
 
     // Output start and goal positions
     std::cout << "Start: " << std::endl;
-    Vector2::print(*start);
+    Vector2::print(start);
     std::cout << "Goal: " << std::endl;
-    Vector2::print(*goal);
+    Vector2::print(goal);
 
     // Complete the search, and get the output from it
     Path directionPath = dfs(mazeType, start, goal, maze, visited);
@@ -106,7 +105,7 @@ Path dfs(char mazeType, Vector2 *start, Vector2 *goal, char* maze, bool* visited
     while (!dfs_stack.empty())
     {
         // Check if the direction has been assigned, if not calculate it
-        if (Vector2::isZero(*direction))
+        if (Vector2::isZero(direction))
         {
             // Calculate position from the most recent visited node
             Vector2 *calcedPos = calculatePos(path, path.size() - 1);

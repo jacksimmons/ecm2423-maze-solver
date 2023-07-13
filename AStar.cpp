@@ -1,4 +1,3 @@
-// Commented fully
 #include <algorithm>
 #include <queue>
 
@@ -25,9 +24,9 @@ void runAStar(char mazeType, bool outputMaze)
 
     // Output the start and end of the maze
     std::cout << "Start: " << std::endl;
-    Vector2::print(*start);
+    Vector2::print(start);
     std::cout << "Goal: " << std::endl;
-    Vector2::print(*goal);
+    Vector2::print(goal);
 
     // Complete the search
     std::tuple<Path, int> pathData = astar(mazeType, start, goal, maze);

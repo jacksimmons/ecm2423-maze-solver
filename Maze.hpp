@@ -1,4 +1,3 @@
-// Commented fully
 #ifndef MAZE_H
 #define MAZE_H 1
 

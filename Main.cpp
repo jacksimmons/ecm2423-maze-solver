@@ -1,4 +1,3 @@
-// Commented fully
 #include <chrono>
 #include <stdexcept>
 #include <string>
@@ -101,7 +100,6 @@ int main(int argc, char **argv)
     delete DOWN;
     delete LEFT;
     delete RIGHT;
-    delete ZERO;
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);

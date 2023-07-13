@@ -1,4 +1,3 @@
-// Commented fully
 #include "Vector2.hpp"
 
 // These are the cardinal directions (and zero vector), used in both search algorithms for convenience.
