@@ -1,0 +1,6 @@
+﻿  Main.cpp
+  Maze.cpp
+C:\Git\maze-solver\maze-solver\src\Maze.cpp(84,16): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Vector2.cpp
+  Generating Code...
+  maze-solver.vcxproj -> C:\Git\maze-solver\x64\Debug\maze-solver.exe

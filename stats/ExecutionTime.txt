@@ -10,15 +10,15 @@ First update after submission
 
 Average execution times:
 DFS:
-Easy - 6.82ms
+Easy - 682us
 Medium - 25.1ms
 Large - 175ms
 (1 run)
 VLarge - 11.6s, opt 1.10s
 
 AStar:
-Easy - 6.94ms
+Easy - 694us
 Medium - 37.7ms
 (1 run)
 Large - 11.5s, opt 2.19s
-VLarge - ops 132s
+VLarge - opt 132s
