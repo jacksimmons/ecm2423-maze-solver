@@ -1,7 +1,0 @@
-- get current node (vector2)
-- pick a direction that isn't visited (doesn't matter preference)
-- go all the way down that direction until a wall is hit (adding each visited node to the path, and to visited)
-- if there is another direction at the wall that isn't back, try that
-- repeat steps 3-4 until the goal is reached, or backtracking is required
-- remove each backtracked node from the path, keep it in visited
-- backtrack until a new direction is possible, then try that one

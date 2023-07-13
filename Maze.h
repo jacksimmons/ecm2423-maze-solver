@@ -8,12 +8,6 @@
 
 #include "Vector2.h"
 
-// Preprocessor definitions for MAZE(suffix) notation
-// Example: MAZE(NAME) = JOIN({maze_type}_, NAME) = {maze_type}_NAME
-#define JOIN(a, b) a ## b
-// E_ = Easy, M_ = Medium, L_ = Large, VL_ = VLarge
-#define MAZE(suffix) JOIN(E_, suffix)
-
 // Define the maze macros
 #define E_COLS 20
 #define E_ROWS 10
@@ -30,10 +24,10 @@
 #define L_FILENAME "mazes/maze-Large.txt"
 #define L_NAME "LARGE"
 
-#define VL_COLS 2000
-#define VL_ROWS 1000
-#define VL_FILENAME "mazes/maze-VLarge.txt"
-#define VL_NAME "VLARGE"
+#define V_COLS 2000
+#define V_ROWS 1000
+#define V_FILENAME "mazes/maze-VLarge.txt"
+#define V_NAME "VLARGE"
 
 // Define node macros
 #define EMPTY '-'
@@ -42,12 +36,15 @@
 typedef std::vector<Vector2 *> Path;
 
 // Function templates
+std::tuple<char *, Vector2 *, Vector2 *> readMaze(char);
 Vector2 *calculatePos(Path &path, int index);
-int calculatePosIndex(Vector2 *pos);
-std::tuple<char *, Vector2 *, Vector2 *> readMaze();
-Vector2 *calculatePos(Path &path, int index);
-int calculatePosIndex(Vector2 *pos);
+int calculatePosIndex(char, Vector2 *pos);
 void outputPathToFile(std::string header, Path path);
-void outputMazeToFile(char *maze, Path &path, bool *visited);
-void outputMazeToFile(char *maze, Path &path);
+void outputMazeToFile(char, char *, Path &, bool *);
+void outputMazeToFile(char, char *, Path &);
+
+int getCols(char);
+int getRows(char);
+std::string getFilename(char);
+std::string getName(char);
 #endif

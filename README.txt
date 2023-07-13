@@ -5,15 +5,6 @@ https://gcc.gnu.org/
 (Alternatively, run with Visual Studio Code or an IDE with a built-in C++ compiler)
 
 
-To run:
-To change which maze to solve, go into "Maze.h", and edit the MAZE preprocessor definition:
-#define MAZE(suffix) JOIN({maze size}_, suffix)
-
-#define MAZE(suffix) JOIN(E_, suffix) // Easy
-#define MAZE(suffix) JOIN(M_, suffix) // Medium
-#define MAZE(suffix) JOIN(L_, suffix) // Large
-#define MAZE(suffix) JOIN(VL_, suffix) // VLarge
-
 Now in Main.cpp:
 To run both algorithms, change nothing (note that as A* happens after, only the A* output will be written
 to PathOutput.txt)
@@ -23,9 +14,30 @@ This is explained further under Depth First Search: and A* Search:
 
 Now run the following commands:
 1. g++ *.cpp -O3 -flto -o a.exe
-2. ./a.exe
 (The command line arguments -O3 and -flto are optional optimisation flags which lead to faster execution)
 (These are only necessary for the VLarge maze)
+
+2. ./a.exe [MAZE] [ALG] [ITERS] [OUTPUT_MAZE]
+
+No arguments leads to the default process (Easy, DFS, 1 iteration).
+
+[MAZE] default: "E"
+    should be replaced by one character to represent the file name of the maze to solve:
+
+    maze-Easy.txt = E
+    maze-Medium.txt = M
+    maze-Large.txt = L
+    maze-VLarge.txt = V
+
+[ALG] default: "dfs"
+    should be replaced by "astar" or "dfs".
+
+[ITERS] default: "1"
+    must be an integer greater than 0. The number of executions to carry out (for
+    calculating average speed).
+
+[OUTPUT_MAZE] default: "true"
+    whether to output the maze calculated by the algorithm
 
 
 Depth-First Search:

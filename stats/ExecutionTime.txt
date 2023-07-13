@@ -1,0 +1,24 @@
+Timings for each version of the project.
+These are measured with the following settings:
+
+ITERS - 100 (unless too slow)
+OUTPUT_MAZE - false (biggest overhead)
+
+
+First update after submission
+(13/7/23 - v1.1)
+
+Average execution times:
+DFS:
+Easy - 6.82ms
+Medium - 25.1ms
+Large - 175ms
+(1 run)
+VLarge - 11.6s, opt 1.10s
+
+AStar:
+Easy - 6.94ms
+Medium - 37.7ms
+(1 run)
+Large - 11.5s, opt 2.19s
+VLarge - ops 132s

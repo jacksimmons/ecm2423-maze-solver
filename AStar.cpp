@@ -9,11 +9,8 @@
 #include "Constants.h"
 
 // Commented
-void runAStar()
+void runAStar(char mazeType, bool outputMaze)
 {
-    // Create a clock to measure runtime speed
-    const clock_t startTime = clock();
-
     // Initialise the maze
     char* maze;
 
@@ -22,7 +19,7 @@ void runAStar()
     Vector2 *goal;
 
     // Read the vectors from the read maze
-    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
+    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze(mazeType);
     maze = std::get<0>(mazeInfo);
     start = std::get<1>(mazeInfo);
     goal = std::get<2>(mazeInfo);
@@ -34,19 +31,18 @@ void runAStar()
     Vector2::print(*goal);
 
     // Complete the search
-    std::tuple<Path, int> pathData = astar(start, goal, maze);
+    std::tuple<Path, int> pathData = astar(mazeType, start, goal, maze);
     Path finalPath = std::get<0>(pathData);
     int numNodes = std::get<1>(pathData);
 
     // Output the path and maze to files
-    outputPathToFile("--- A* SEARCH " + std::string(MAZE(NAME)) + " [" + MAZE(FILENAME) + "] ---", finalPath);
+    outputPathToFile("--- A* SEARCH " + getName(mazeType) + " [" + getFilename(mazeType) + "] ---", finalPath);
     if (outputMaze)
-        outputMazeToFile(maze, finalPath);
+        outputMazeToFile(mazeType, maze, finalPath);
 
     // Execution statistics
     std::cout << "Number of nodes visited: " << numNodes << std::endl;
     std::cout << "Number of steps in final path: " << finalPath.size() << std::endl;
-    std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << std::endl;
 
     // Garbage collection
     delete[] maze;
@@ -60,8 +56,8 @@ void runAStar()
     }
 }
 
-// Commented
-std::tuple<Path, int> astar(Vector2 *start, Vector2 *goal, char* maze)
+
+std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* maze)
 {
     // Counter for how many nodes are explored
     int numNodes = 0;
@@ -119,22 +115,22 @@ std::tuple<Path, int> astar(Vector2 *start, Vector2 *goal, char* maze)
         // Uses node as a test case by setting its position to said cardinal direction
         node->setPos(posUp);
         bool canGoUp = false;
-        if (!(pos->y <= 0 || maze[calculatePosIndex(posUp)] == WALL))
+        if (!(pos->y <= 0 || maze[calculatePosIndex(mazeType, posUp)] == WALL))
             canGoUp = true;
 
         node->setPos(posLeft);
         bool canGoLeft = false;
-        if (!(pos->x <= 0 || maze[calculatePosIndex(posLeft)] == WALL))
+        if (!(pos->x <= 0 || maze[calculatePosIndex(mazeType, posLeft)] == WALL))
             canGoLeft = true;
 
         node->setPos(posRight);
         bool canGoRight = false;
-        if (!(pos->x >= MAZE(COLS) - 1 || maze[calculatePosIndex(posRight)] == WALL))
+        if (!(pos->x >= getCols(mazeType) - 1 || maze[calculatePosIndex(mazeType, posRight)] == WALL))
             canGoRight = true;
 
         node->setPos(posDown);
         bool canGoDown = false;
-        if (!(pos->y >= MAZE(ROWS) - 1 || maze[calculatePosIndex(posDown)] == WALL))
+        if (!(pos->y >= getRows(mazeType) - 1 || maze[calculatePosIndex(mazeType, posDown)] == WALL))
             canGoDown = true;
         
         // Set the position back
@@ -252,7 +248,7 @@ std::tuple<Path, int> astar(Vector2 *start, Vector2 *goal, char* maze)
     return std::make_tuple(path, numNodes);
 }
 
-// Commented
+
 std::deque<std::tuple<Node *, int>> insertionSortByCost(std::deque<std::tuple<Node *, int>> &list, Vector2 *goal)
 {
     // Quick exit if necessary
@@ -285,14 +281,14 @@ std::deque<std::tuple<Node *, int>> insertionSortByCost(std::deque<std::tuple<No
     return list;
 }
 
-// Commented
+
 int calculateCost(Node *node, Vector2 *goal)
 {
     // Size of path thus far + Manhattan distance to the goal
     return node->getSize() + node->getPos()->distTo(*goal);
 }
 
-// Commented
+
 bool isNodeParentOf(Node *potential_parent, Node *potential_child)
 {
     // Iterate through every node in node_ptr->getPrev()->...->0
@@ -339,7 +335,7 @@ bool hasNodeExplored(Node *node, Vector2 *pos)
 }
 
 // Commented
-bool isPosInVector(Vector2 *pos, std::vector<Vector2 *> &vecs)
+bool isPosInVector(Vector2 *pos, Path &vecs)
 {
     // Iterate through every Vector2 in the vector, checking if
     // it has the same value as the provided position

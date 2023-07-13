@@ -5,5 +5,5 @@
 #include "Maze.h"
 
 // Function templates
-void runDFS();
-Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited);
+void runDFS(char, bool);
+Path dfs(char, Vector2*, Vector2*, char*, bool*);

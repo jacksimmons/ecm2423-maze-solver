@@ -8,21 +8,18 @@
 #include "Constants.h"
 
 // Commented
-void runDFS()
+void runDFS(char mazeType, bool outputMaze)
 {
-    // Create a clock to measure runtime speed
-    const clock_t startTime = clock();
-
     // Initialise the maze and visited arrays
     char* maze;
-    bool* visited = new bool[MAZE(ROWS) * MAZE(COLS)];
+    bool* visited = new bool[getRows(mazeType) * getCols(mazeType)];
 
     // Make the visited array full of "false"
-    for (int i = 0; i < MAZE(ROWS); i++)
+    for (int i = 0; i < getRows(mazeType); i++)
     {
-        for (int j = 0; j < MAZE(COLS); j++)
+        for (int j = 0; j < getCols(mazeType); j++)
         {
-            visited[i * MAZE(COLS) + j] = false;
+            visited[i * getCols(mazeType) + j] = false;
         }
     }
 
@@ -31,7 +28,7 @@ void runDFS()
     Vector2 *goal;
 
     // Read the vectors from the read maze
-    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze();
+    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze(mazeType);
     maze = std::get<0>(mazeInfo);
     start = std::get<1>(mazeInfo);
     goal = std::get<2>(mazeInfo);
@@ -43,7 +40,7 @@ void runDFS()
     Vector2::print(*goal);
 
     // Complete the search, and get the output from it
-    Path directionPath = dfs(start, goal, maze, visited);
+    Path directionPath = dfs(mazeType, start, goal, maze, visited);
 
     std::vector<Vector2 *> finalPath;
 
@@ -58,28 +55,27 @@ void runDFS()
     }
 
     // File output
-    outputPathToFile("--- DFS SEARCH " + std::string(MAZE(NAME)) + " [" + MAZE(FILENAME) + "] ---", finalPath);
+	outputPathToFile("--- DFS SEARCH " + getName(mazeType) + " [" + getFilename(mazeType) + "] ---", finalPath);
     if (outputMaze)
-        outputMazeToFile(maze, finalPath, visited);
+        outputMazeToFile(mazeType, maze, finalPath, visited);
+
+	// Calculate the number of visited nodes
+	int numNodes = 0;
+	for (int i = 0; i < getRows(mazeType) * getCols(mazeType); i++)
+	{
+		if (visited[i])
+		{
+			numNodes++;
+		}
+	}
+
+	// Execution statistics
+	std::cout << "Number of nodes visited: " << numNodes << std::endl;
+	std::cout << "Number of steps in final path: " << finalPath.size() << std::endl;
     
     // Garbage collection for positions
     for (Vector2 *vec : finalPath)
         delete vec;
-    
-    // Calculate the number of visited nodes
-    int numNodes = 0;
-    for (int i = 0; i < MAZE(ROWS) * MAZE(COLS); i++)
-    {
-        if (visited[i])
-        {
-            numNodes++;
-        }
-    }
-
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << numNodes << std::endl;
-    std::cout << "Number of steps in final path: " << finalPath.size() << std::endl;
-    std::cout << "Execution time: " <<  float(clock() - startTime) / CLOCKS_PER_SEC << "s" << std::endl;
 
     // Garbage collection
     delete start;
@@ -90,10 +86,10 @@ void runDFS()
 }
 
 // Commented
-Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
+Path dfs(char mazeType, Vector2 *start, Vector2 *goal, char* maze, bool* visited)
 {
     // Mark starting node as visited as we start here
-    visited[calculatePosIndex(start)] = true;
+    visited[calculatePosIndex(mazeType, start)] = true;
 
     // Initialise direction and pos
     Vector2 *direction = new Vector2();
@@ -127,20 +123,20 @@ Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
             Vector2 *posRight = *pos + *RIGHT;
 
             // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
-            if (pos->y > 0 && maze[calculatePosIndex(posUp)] != WALL && !visited[calculatePosIndex(posUp)])
+            if (pos->y > 0 && maze[calculatePosIndex(mazeType, posUp)] != WALL && !visited[calculatePosIndex(mazeType, posUp)])
                 selectedDir = UP;
-            else if (pos->x > 0 && maze[calculatePosIndex(posLeft)] != WALL && !visited[calculatePosIndex(posLeft)])
+            else if (pos->x > 0 && maze[calculatePosIndex(mazeType, posLeft)] != WALL && !visited[calculatePosIndex(mazeType, posLeft)])
                 selectedDir = LEFT;
-            else if (pos->y < MAZE(ROWS)-1 && maze[calculatePosIndex(posDown)] != WALL && !visited[calculatePosIndex(posDown)])
+            else if (pos->y < getRows(mazeType)-1 && maze[calculatePosIndex(mazeType, posDown)] != WALL && !visited[calculatePosIndex(mazeType, posDown)])
                 selectedDir = DOWN;
-            else if (pos->x < MAZE(COLS)-1 && maze[calculatePosIndex(posRight)] != WALL && !visited[calculatePosIndex(posRight)])
+			else if (pos->x < getCols(mazeType)-1 && maze[calculatePosIndex(mazeType, posRight)] != WALL && !visited[calculatePosIndex(mazeType, posRight)])
                 selectedDir = RIGHT;
             else
             {
                 // No direction has been assigned, and none are possible (or beneficial), so we backtrack until one is found.
                 // This is the BREADTH part of the search (Depth first, then Breadth)
                 selectedDir = ZERO;
-                visited[calculatePosIndex(pos)] = true;
+                visited[calculatePosIndex(mazeType, pos)] = true;
 
                 // Backtracking, so remove most recent node
                 dfs_stack.pop();
@@ -165,19 +161,19 @@ Path dfs(Vector2 *start, Vector2 *goal, char* maze, bool* visited)
             // When the direction is removed, the above block (BREADTH and BACKTRACKING) begins
             Vector2 *posPlusDirection = *pos + *direction;
 
-            bool adjacent_in_maze_bounds = posPlusDirection->x >= 0 && posPlusDirection->y >= 0 && posPlusDirection->x <= MAZE(COLS)-1 && posPlusDirection->y <= MAZE(ROWS)-1;
+            bool adjacent_in_maze_bounds = posPlusDirection->x >= 0 && posPlusDirection->y >= 0 && posPlusDirection->x <= getCols(mazeType)-1 && posPlusDirection->y <= getRows(mazeType)-1;
 
             // Check if the next node is in the maze
             if (adjacent_in_maze_bounds)
             {
-                bool adjacent_not_wall = (maze[calculatePosIndex(posPlusDirection)] != WALL && !visited[calculatePosIndex(posPlusDirection)]);
+                bool adjacent_not_wall = (maze[calculatePosIndex(mazeType, posPlusDirection)] != WALL && !visited[calculatePosIndex(mazeType, posPlusDirection)]);
                 delete posPlusDirection;
                 // If the adjacent node is not a wall, we can assign to the adjacent std::vector
                 if (adjacent_not_wall)
                 {
                     // Add the direction to the position
                     pos->set(pos->x + direction->x, pos->y + direction->y);
-                    visited[calculatePosIndex(pos)] = true;
+                    visited[calculatePosIndex(mazeType, pos)] = true;
 
                     // Add a pointer to the correct direction to the path
                     if (*direction == *LEFT)
