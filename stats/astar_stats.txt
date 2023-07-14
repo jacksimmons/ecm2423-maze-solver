@@ -1,8 +1,10 @@
-[14/7] v1.01
+[14/7] v1.01 / v1.02 classes
 Easy - 550us (1000)
-Medium - 37.7ms 2046v 321f (1000)
+Medium - 37.7ms (1000)
 Large - 12.2s (1)
 VLarge - Untested
 
-[14/7] v1.02 - Discovered weighted A* (sub-optimal, but more performant)
-Medium - 6.84ms 522v 327f (1000)
+v1.03 - smart pointers (speed decrease in exchange for memory safety)
+Easy - 807us (100)
+Medium - 107ms (1000)
+Large - 26.9s (1)

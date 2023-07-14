@@ -7,14 +7,13 @@
 class SearchAlg {
 protected:
     char mMazeType;
-    char *mMaze;
-    Vector2 *mStart;
-    Vector2 *mGoal;
-    std::vector<Vector2 *> mPath;
+    std::vector<char> mMaze;
+    std::shared_ptr<Vector2> mStart;
+    std::shared_ptr<Vector2> mGoal;
+    std::vector<std::unique_ptr<Vector2>> mPath;
     bool mOutputMazeToFile;
 public:
     SearchAlg(char, bool);
-    ~SearchAlg();
     virtual void run() = 0;
 };
 #endif

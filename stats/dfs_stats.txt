@@ -1,5 +1,9 @@
-[14/7] v1.02
+[14/7] v1.01 / v1.02 classes
 Easy - 523us (1000)
 Medium - 20.9ms (1000)
 Large - 181ms (100)
 VLarge - 12.0s (1)
+
+v1.03 - smart pointers (speed decrease in exchange for memory safety)
+Easy - 842us (10000)
+Medium - 71.3ms (100)

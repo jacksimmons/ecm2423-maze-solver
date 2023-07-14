@@ -2,16 +2,19 @@
 #include <tuple>
 
 #include "Maze.hpp"
+#include <memory>
+#include <vector>
+
 #include "Vector2.hpp"
 
 
 // Convert the maze file into a char array
 // Also provides start and goal vectors
-std::tuple<char *, Vector2 *, Vector2 *> readMaze(char mazeType)
+std::tuple<std::vector<char>, std::unique_ptr<Vector2>, std::unique_ptr<Vector2>> readMaze(char mazeType)
 {
-	char* maze = new char[getRows(mazeType) * getCols(mazeType)];
-    Vector2 *start = new Vector2();
-    Vector2 *goal = new Vector2();
+    std::vector<char> maze;
+    std::unique_ptr<Vector2> start = std::make_unique<Vector2>();
+    std::unique_ptr<Vector2> goal = std::make_unique<Vector2>();
 
     // Create input file stream
     std::ifstream fin;
@@ -24,7 +27,7 @@ std::tuple<char *, Vector2 *, Vector2 *> readMaze(char mazeType)
         {
             char c;
             fin >> c;
-            maze[i * getCols(mazeType) + j] = c;
+            maze.push_back(c);
 
             // If we're on the first row, and there is an empty node
             // Then this must be the start node
@@ -52,23 +55,19 @@ std::tuple<char *, Vector2 *, Vector2 *> readMaze(char mazeType)
 
 
 // Get the ith element of the path, and return its vector form
-Vector2 *calculatePos(Path &path, int index)
+std::unique_ptr<Vector2> calculatePos(Path &path, int index)
 {
-    Vector2 *pos = new Vector2();
-    Vector2 *dir;
+    std::unique_ptr<Vector2> pos = std::make_unique<Vector2>();
     for (int i = 0; i <= index; i++)
-    {
-        dir = path.at(i);
-        pos->set(pos->x + dir->x, pos->y + dir->y);
-    }
+        *pos += *path.at(i);
     return pos;
 }
 
 
 // Convert vector to index of maze array
-int calculatePosIndex(char mazeType, Vector2 *pos)
+int calculatePosIndex(char mazeType, Vector2 &pos)
 {
-    return (pos->y) * getCols(mazeType) + pos->x;
+    return (pos.y) * getCols(mazeType) + pos.x;
 }
 
 
@@ -88,7 +87,7 @@ void outputPathToFile(std::string header, Path path)
 }
 
 
-void outputMazeToFile(char mazeType, char *maze, Path &path, bool *visited)
+void outputMazeToFile(char mazeType, std::vector<char> maze, Path &path, std::vector<bool> visited)
 {
     std::string fileName = "MazeOutput.txt";
     std::ofstream file;
@@ -101,7 +100,7 @@ void outputMazeToFile(char mazeType, char *maze, Path &path, bool *visited)
         {
             // Empty by default
             char c = '-';
-            Vector2 *pos = new Vector2(j, i);
+            std::unique_ptr<Vector2> pos = std::make_unique<Vector2>(j, i);
             if (maze[i * getCols(mazeType) + j] == WALL)
                 c = '#';
             else
@@ -121,7 +120,6 @@ void outputMazeToFile(char mazeType, char *maze, Path &path, bool *visited)
                     }
                 }
             }
-            delete pos;
             // Output the character c to file
             file << c;
         }
@@ -132,14 +130,19 @@ void outputMazeToFile(char mazeType, char *maze, Path &path, bool *visited)
 
 
 // Output maze when a visited array is not present
-void outputMazeToFile(char mazeType, char *maze, Path &path)
+void outputMazeToFile(char mazeType, std::vector<char> maze, Path &path)
 {
     // Make new visited array and fill it with false
-    bool *visited = new bool[getCols(mazeType) * getRows(mazeType)];
-    for (int i = 0; i < getCols(mazeType) * getRows(mazeType); i++)
-        visited[i] = false;
+    std::vector<bool> visited;
+    for (int i = 0; i < getCols(mazeType); i++)
+    {
+        for (int j = 0; i < getRows(mazeType); j++)
+        {
+            visited.push_back(false);
+        }
+    }
+        
     outputMazeToFile(mazeType, maze, path, visited);
-    delete[] visited;
 }
 
 

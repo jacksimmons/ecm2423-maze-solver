@@ -32,15 +32,17 @@
 #define EMPTY '-'
 #define WALL '#'
 
-typedef std::vector<Vector2 *> Path;
+typedef std::vector<std::shared_ptr<Vector2>> Path;
+
 
 // Function templates
-std::tuple<char *, Vector2 *, Vector2 *> readMaze(char);
-Vector2 *calculatePos(Path &path, int index);
-int calculatePosIndex(char, Vector2 *pos);
+std::tuple<std::vector<char>, std::unique_ptr<Vector2>, std::unique_ptr<Vector2>> readMaze(char);
+std::unique_ptr<Vector2> calculatePos(Path &path, int index);
+int calculatePosIndex(char, Vector2&);
 void outputPathToFile(std::string header, Path path);
-void outputMazeToFile(char, char *, Path &, bool *);
-void outputMazeToFile(char, char *, Path &);
+void outputMazeToFile(char, std::vector<char>, Path &, std::vector<bool>);
+void outputMazeToFile(char, std::vector<char>, Path &);
+
 
 int getCols(char);
 int getRows(char);

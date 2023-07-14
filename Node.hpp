@@ -1,5 +1,7 @@
 #ifndef NODE_H
-#define NODE_H
+#define NODE_H 1
+
+#include <memory>
 #include "Vector2.hpp"
 
 // Node class template
@@ -7,18 +9,18 @@ class Node
 {
 private:
     // Members
-    Node *previous_node;
-    Vector2 *position;
+    std::unique_ptr<Node> previous_node;
+    std::unique_ptr<Vector2> position;
 public:
     // Constructors
 	Node();
-    Node(Node *prev_node, Vector2 *pos);
+    Node(std::unique_ptr<Node>, std::unique_ptr<Vector2>);
 
     // Methods
-    Node *getPrev() const;
-    void setPrev(Node *prev);
-    Vector2 *getPos() const;
-    void setPos(Vector2 *pos);
+    std::unique_ptr<Node> getPrev() const;
+    void setPrev(std::unique_ptr<Node>);
+    std::unique_ptr<Vector2> getPos() const;
+    void setPos(std::unique_ptr<Vector2>);
     int getSize();
 };
 #endif

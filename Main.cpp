@@ -8,11 +8,11 @@
 #include "Constants.hpp"
 
 // Assign to the externs in Constants.h
-Vector2 *g_LEFT = new Vector2(-1, 0);
-Vector2 *g_UP = new Vector2(0, -1);
-Vector2 *g_RIGHT = new Vector2(1, 0);
-Vector2 *g_DOWN = new Vector2(0, 1);
-Vector2 *g_ZERO = new Vector2(0, 0);
+std::unique_ptr<Vector2> g_UP = std::make_unique<Vector2>(0, -1);
+std::unique_ptr<Vector2> g_DOWN = std::make_unique<Vector2>(0, 1);
+std::unique_ptr<Vector2> g_LEFT = std::make_unique<Vector2>(-1, 0);
+std::unique_ptr<Vector2> g_RIGHT = std::make_unique<Vector2>(1, 0);
+std::unique_ptr<Vector2> g_ZERO = std::make_unique<Vector2>(0, 0);
 
 int main(int argc, char **argv)
 {
@@ -94,12 +94,6 @@ int main(int argc, char **argv)
 
     // Run the search algorithms
 	runSolver(mazeType, dfs, iterations, outputMaze);
-
-    // Final garbage collection
-    delete g_UP;
-    delete g_DOWN;
-    delete g_LEFT;
-    delete g_RIGHT;
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);

@@ -1,15 +1,15 @@
 #include "CostNode.hpp"
 
-CostNode::CostNode(Vector2* goal)
+CostNode::CostNode(std::unique_ptr<Vector2> goal)
 	: Node()
 {
-	cost = CostNode::calculateCost(this, goal);
+	cost = calculateCost(goal);
 }
 
-CostNode::CostNode(CostNode* prev_node, Vector2* pos, Vector2* goal)
+CostNode::CostNode(std::unique_ptr<CostNode> prev_node, std::unique_ptr<Vector2> pos, std::unique_ptr<Vector2> goal)
 	: Node(prev_node, pos)
 {
-	cost = CostNode::calculateCost(this, goal);
+	cost = calculateCost(goal);
 }
 
 int CostNode::getCost()

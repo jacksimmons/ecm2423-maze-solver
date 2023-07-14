@@ -2,39 +2,39 @@
 
 Node::Node()
 {
-	previous_node = NULL;
-	position = new Vector2();
+	previous_node = nullptr;
+	position = std::make_unique<Vector2>();
 }
 
-Node::Node(Node *prev_node, Vector2 *pos)
+Node::Node(std::unique_ptr<Node> prev_node, std::unique_ptr<Vector2> pos)
 {
-    previous_node = prev_node;
-    position = pos;
+    previous_node = std::move(prev_node);
+    position = std::move(pos);
 }
 
-Node *Node::getPrev() const
+std::unique_ptr<Node> Node::getPrev() const
 {
-    return previous_node;
+    return std::make_unique<Node>(std::move(previous_node));
 }
 
-void Node::setPrev(Node *prev)
+void Node::setPrev(std::unique_ptr<Node> prev)
 {
-    previous_node = prev;
+    previous_node = std::move(prev);
 }
 
-Vector2 *Node::getPos() const
+std::unique_ptr<Vector2> Node::getPos() const
 {
-    return position;
+    return std::make_unique<Vector2>(std::move(position));
 }
 
-void Node::setPos(Vector2 *pos)
+void Node::setPos(std::unique_ptr<Vector2> pos)
 {
-    position = pos;
+    position = std::move(pos);
 }
 
 int Node::getSize()
 {
-    if (getPrev() == 0)
+    if (getPrev() == nullptr)
         return 1;
     return getPrev()->getSize() + 1;
 }

@@ -1,6 +1,7 @@
+#include <math.h>
+
 #include "Vector2.hpp"
 #include "Constants.hpp"
-#include <math.h>
 
 // Vector2 stands for 2D vector (x and y components)
 // It is a struct used to represent positions in the maze
@@ -26,32 +27,32 @@ void Vector2::set(int _x, int _y)
     y = _y;
 }
 
-int Vector2::distTo(Vector2 *v2)
+int Vector2::distTo(Vector2 v2)
 {
-    return (abs(x - v2->x) + abs(y - v2->y));
+    return (abs(x - v2.x) + abs(y - v2.y));
 }
 
-bool Vector2::operator==(const Vector2 v2)
+bool Vector2::operator==(const Vector2& v2)
 {
     return x == v2.x && y == v2.y;
 }
 
-bool Vector2::operator!=(const Vector2 v2)
+bool Vector2::operator!=(const Vector2& v2)
 {
     return !Vector2::operator==(v2);
 }
 
-void Vector2::operator+=(const Vector2 v2)
+void Vector2::operator+=(const Vector2& v2)
 {
     set(x + v2.x, y + v2.y);
 }
 
-Vector2 *Vector2::operator+(const Vector2 v2)
+std::unique_ptr<Vector2> Vector2::operator+(const Vector2& rhs)
 {
-    return new Vector2(x + v2.x, y + v2.y);
+    return std::make_unique<Vector2>(x + rhs.x, y + rhs.y);
 }
 
-Vector2 *Vector2::operator-(const Vector2 v2)
+std::unique_ptr<Vector2> Vector2::operator-(const Vector2& rhs)
 {
-    return new Vector2(x - v2.x, y - v2.y);
+    return std::make_unique<Vector2>(x - rhs.x, y - rhs.y);
 }
