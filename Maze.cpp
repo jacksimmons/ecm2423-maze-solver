@@ -10,11 +10,11 @@
 
 // Convert the maze file into a char array
 // Also provides start and goal vectors
-std::tuple<std::vector<char>, std::unique_ptr<Vector2>, std::unique_ptr<Vector2>> readMaze(char mazeType)
+std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char mazeType)
 {
     std::vector<char> maze;
-    std::unique_ptr<Vector2> start = std::make_unique<Vector2>();
-    std::unique_ptr<Vector2> goal = std::make_unique<Vector2>();
+    std::shared_ptr<Vector2> start = std::make_shared<Vector2>();
+    std::shared_ptr<Vector2> goal = std::make_shared<Vector2>();
 
     // Create input file stream
     std::ifstream fin;
@@ -55,7 +55,7 @@ std::tuple<std::vector<char>, std::unique_ptr<Vector2>, std::unique_ptr<Vector2>
 
 
 // Get the ith element of the path, and return its vector form
-std::unique_ptr<Vector2> calculatePos(Path &path, int index)
+std::unique_ptr<Vector2> calculatePos(VectorPath& path, int index)
 {
     std::unique_ptr<Vector2> pos = std::make_unique<Vector2>();
     for (int i = 0; i <= index; i++)
@@ -65,14 +65,14 @@ std::unique_ptr<Vector2> calculatePos(Path &path, int index)
 
 
 // Convert vector to index of maze array
-int calculatePosIndex(char mazeType, Vector2 &pos)
+int calculatePosIndex(char mazeType, Vector2& pos)
 {
     return (pos.y) * getCols(mazeType) + pos.x;
 }
 
 
 // Output the path to PathOutput.txt
-void outputPathToFile(std::string header, Path path)
+void outputPathToFile(std::string header, VectorPath& path)
 {
     std::string fileName = "PathOutput.txt";
     std::ofstream file;
@@ -87,7 +87,7 @@ void outputPathToFile(std::string header, Path path)
 }
 
 
-void outputMazeToFile(char mazeType, std::vector<char> maze, Path &path, std::vector<bool> visited)
+void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, std::vector<bool> visited)
 {
     std::string fileName = "MazeOutput.txt";
     std::ofstream file;
@@ -130,7 +130,7 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, Path &path, std::ve
 
 
 // Output maze when a visited array is not present
-void outputMazeToFile(char mazeType, std::vector<char> maze, Path &path)
+void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path)
 {
     // Make new visited array and fill it with false
     std::vector<bool> visited;

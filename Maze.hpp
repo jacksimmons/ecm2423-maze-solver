@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Vector2.hpp"
+#include "Typedef.hpp"
 
 // Define the maze macros
 #define E_COLS 20
@@ -32,17 +33,13 @@
 #define EMPTY '-'
 #define WALL '#'
 
-typedef std::vector<std::shared_ptr<Vector2>> Path;
-
-
 // Function templates
-std::tuple<std::vector<char>, std::unique_ptr<Vector2>, std::unique_ptr<Vector2>> readMaze(char);
-std::unique_ptr<Vector2> calculatePos(Path &path, int index);
+std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char);
+std::unique_ptr<Vector2> calculatePos(VectorPath&, int);
 int calculatePosIndex(char, Vector2&);
-void outputPathToFile(std::string header, Path path);
-void outputMazeToFile(char, std::vector<char>, Path &, std::vector<bool>);
-void outputMazeToFile(char, std::vector<char>, Path &);
-
+void outputPathToFile(std::string header, VectorPath&);
+void outputMazeToFile(char, std::vector<char>, VectorPath&, std::vector<bool>);
+void outputMazeToFile(char, std::vector<char>, VectorPath&);
 
 int getCols(char);
 int getRows(char);

@@ -23,30 +23,30 @@ void DFS::run()
 {
     // Output start and goal positions
     std::cout << "Start: " << std::endl;
-    Vector2::print(mStart);
+    Vector2::print(*mStart);
     std::cout << "Goal: " << std::endl;
-    Vector2::print(mGoal);
+    Vector2::print(*mGoal);
 
     // Complete the search
     this->dfs();
 
-    Path directionPath = mPath;
-    mPath.clear();
+    VectorPath path;
+    for (int i = 0; i < mPath.size(); i++)
+        path.push_back(std::move(mPath.top()));
 
-    // directionPath contains the start position, followed by a series of directions.
-    // The sum of all directions up to index i gives the intended position at that index.
-    // Final path output (converting a vector of cardinal directions into one of positions)
-    for (int i = directionPath.size()-1; i >= 0; i--)
-    {
-        // Calculate the position of the ith element in the path
-        std::unique_ptr<Vector2> calcPos = calculatePos(directionPath, i);
-        mPath.push_back(calcPos);
-    }
+    // // directionPath contains the start position, followed by a series of directions.
+    // // The sum of all directions up to index i gives the intended position at that index.
+    // // Final path output (converting a vector of cardinal directions into one of positions)
+    // for (int i = directionPath.size()-1; i >= 0; i--)
+    // {
+    //     // Calculate the position of the ith element in the path
+    //     mPath.push_back(calculatePos(directionPath, i));
+    // }
 
     // File output
-	outputPathToFile("--- DFS SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", mPath);
+	outputPathToFile("--- DFS SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", path);
     if (mOutputMazeToFile)
-        outputMazeToFile(mMazeType, mMaze, mPath, mVisited);
+        outputMazeToFile(mMazeType, mMaze, path, mVisited);
 
 	// Calculate the number of visited nodes
 	int numNodes = 0;
@@ -60,35 +60,34 @@ void DFS::run()
 
 	// Execution statistics
 	std::cout << "Number of nodes visited: " << numNodes << std::endl;
-	std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
+	std::cout << "Number of steps in final path: " << path.size() << std::endl;
 }
 
 void DFS::dfs()
 {
     // Mark starting node as visited as we start here
-    mVisited[calculatePosIndex(mMazeType, mStart)] = true;
+    mVisited[calculatePosIndex(mMazeType, *mStart)] = true;
 
     // Initialise direction and pos
     std::unique_ptr<Vector2> direction = std::make_unique<Vector2>();
     std::unique_ptr<Vector2> pos = std::make_unique<Vector2>(mStart->x, mStart->y); // Copy start into pos
 
     // Push the start to start the path
-    mPath.push_back(mStart);
+    mPath.push(std::make_unique<Vector2>(mStart->x, mStart->y));
 
-    // Initialise the dfs stack
-    std::stack<std::unique_ptr<Vector2>> dfs_stack;
-    dfs_stack.push(mStart);
-
-    while (!dfs_stack.empty())
+    while (!mPath.empty())
     {
         // Check if the direction has been assigned, if not calculate it
-        if (Vector2::isZero(direction))
+        if (Vector2::isZero(*direction))
         {
-            // Calculate position from the most recent visited node
-            pos = calculatePos(mPath, mPath.size() - 1);
+            // No direction has been assigned, so we are backtracking.
+
+            // Move top element into pos and pop from the stack
+            pos = std::move(mPath.top());
+            mPath.pop();
 
             // The next direction to travel in
-            std::unique_ptr<Vector2>selectedDir;
+            Vector2 selectedDir;
 
             // Initialise positions in every cardinal direction from pos
             std::unique_ptr<Vector2> posUp = *pos + *g_UP;
@@ -97,28 +96,25 @@ void DFS::dfs()
             std::unique_ptr<Vector2> posRight = *pos + *g_RIGHT;
 
             // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
-            if (pos->y > 0 && mMaze[calculatePosIndex(mMazeType, posUp)] != WALL && !mVisited[calculatePosIndex(mMazeType, posUp)])
-                selectedDir = g_UP;
-            else if (pos->x > 0 && mMaze[calculatePosIndex(mMazeType, posLeft)] != WALL && !mVisited[calculatePosIndex(mMazeType, posLeft)])
-                selectedDir = g_LEFT;
-            else if (pos->y < getRows(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, posDown)] != WALL && !mVisited[calculatePosIndex(mMazeType, posDown)])
-                selectedDir = g_DOWN;
-			else if (pos->x < getCols(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, posRight)] != WALL && !mVisited[calculatePosIndex(mMazeType, posRight)])
-                selectedDir = g_RIGHT;
+            // ! Prefers UP !
+            if (pos->y > 0 && mMaze[calculatePosIndex(mMazeType, *posUp)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posUp)])
+                selectedDir = *g_UP;
+            else if (pos->x > 0 && mMaze[calculatePosIndex(mMazeType, *posLeft)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posLeft)])
+                selectedDir = *g_LEFT;
+            else if (pos->y < getRows(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, *posDown)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posDown)])
+                selectedDir = *g_DOWN;
+			else if (pos->x < getCols(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, *posRight)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posRight)])
+                selectedDir = *g_RIGHT;
             else
             {
                 // No direction has been assigned, and none are possible (or beneficial), so we backtrack until one is found.
                 // This is the BREADTH part of the search (Depth first, then Breadth)
-                selectedDir = g_ZERO;
-                mVisited[calculatePosIndex(mMazeType, pos)] = true;
-
-                // Backtracking, so remove most recent node
-                dfs_stack.pop();
-                mPath.pop_back();
+                selectedDir = *g_ZERO;
+                mVisited[calculatePosIndex(mMazeType, *pos)] = true;
             }
             
             // The direction has been set, need to restart block
-            direction->set(selectedDir->x, selectedDir->y);
+            direction->set(selectedDir.x, selectedDir.y);
             continue;
         }
         else
@@ -133,35 +129,16 @@ void DFS::dfs()
             // Check if the next node is in the maze
             if (adjacent_in_maze_bounds)
             {
-                bool adjacent_not_wall = (mMaze[calculatePosIndex(mMazeType, posPlusDirection)] != WALL && !mVisited[calculatePosIndex(mMazeType, posPlusDirection)]);
+                bool adjacent_not_wall = (mMaze[calculatePosIndex(mMazeType, *posPlusDirection)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posPlusDirection)]);
                 // If the adjacent node is not a wall, we can assign to the adjacent std::vector
                 if (adjacent_not_wall)
                 {
-                    // Add the direction to the position
-                    pos->set(pos->x + direction->x, pos->y + direction->y);
-                    mVisited[calculatePosIndex(mMazeType, pos)] = true;
+                    // Push pos onto the stack, and assign posPlusDirection to pos
+                    mPath.push(std::move(pos));
+                    pos = std::move(posPlusDirection);
 
-                    // Add a pointer to the correct direction to the path
-                    if (*direction == *g_LEFT)
-                    {
-                        dfs_stack.push(g_LEFT);
-                        mPath.push_back(g_LEFT);
-                    }
-                    else if (*direction == *g_UP)
-                    {
-                        dfs_stack.push(g_UP);
-                        mPath.push_back(g_UP);
-                    }
-                    else if (*direction == *g_RIGHT)
-                    {
-                        dfs_stack.push(g_RIGHT);
-                        mPath.push_back(g_RIGHT);
-                    }
-                    else if (*direction == *g_DOWN)
-                    {
-                        dfs_stack.push(g_DOWN);
-                        mPath.push_back(g_DOWN);
-                    }
+                    // Note that this node has been visited
+                    mVisited[calculatePosIndex(mMazeType, *pos)] = true;
                 }
                 else
                 {

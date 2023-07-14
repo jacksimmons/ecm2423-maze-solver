@@ -1,4 +1,5 @@
 #include <vector>
+#include <stack>
 #include <tuple>
 
 #include <vector>
@@ -10,6 +11,7 @@
 class DFS : public SearchAlg
 {
 private:
+    StackPath mPath;
     std::vector<bool> mVisited;
 public:
     DFS(char, bool);

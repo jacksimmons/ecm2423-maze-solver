@@ -10,7 +10,6 @@ protected:
     std::vector<char> mMaze;
     std::shared_ptr<Vector2> mStart;
     std::shared_ptr<Vector2> mGoal;
-    std::vector<std::unique_ptr<Vector2>> mPath;
     bool mOutputMazeToFile;
 public:
     SearchAlg(char, bool);

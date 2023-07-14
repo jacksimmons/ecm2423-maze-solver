@@ -9,18 +9,25 @@ class Node
 {
 private:
     // Members
-    std::unique_ptr<Node> previous_node;
-    std::unique_ptr<Vector2> position;
+    std::shared_ptr<Node> previous_node;
+    std::shared_ptr<Vector2> position;
+	int cost;
 public:
-    // Constructors
-	Node();
-    Node(std::unique_ptr<Node>, std::unique_ptr<Vector2>);
+	Node(Vector2&);
+	Node(std::shared_ptr<Node>, std::shared_ptr<Vector2>, Vector2&);
+	
+	// Static methods
+	int calculateCost(Vector2 goal)
+	{
+		return getSize() + getPos()->distTo(goal);
+	}
+	int getCost();
 
     // Methods
-    std::unique_ptr<Node> getPrev() const;
-    void setPrev(std::unique_ptr<Node>);
-    std::unique_ptr<Vector2> getPos() const;
-    void setPos(std::unique_ptr<Vector2>);
+    std::shared_ptr<Node> getPrev() const;
+    void setPrev(std::shared_ptr<Node>);
+    std::shared_ptr<Vector2> getPos() const;
+    void setPos(std::shared_ptr<Vector2>);
     int getSize();
 };
 #endif

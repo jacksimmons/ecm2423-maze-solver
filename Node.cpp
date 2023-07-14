@@ -1,35 +1,37 @@
 #include "Node.hpp"
 
-Node::Node()
+Node::Node(Vector2 &goal)
 {
 	previous_node = nullptr;
 	position = std::make_unique<Vector2>();
+    cost = calculateCost(goal);
 }
 
-Node::Node(std::unique_ptr<Node> prev_node, std::unique_ptr<Vector2> pos)
+Node::Node(std::shared_ptr<Node> prev_node, std::shared_ptr<Vector2> pos, Vector2& goal)
 {
-    previous_node = std::move(prev_node);
-    position = std::move(pos);
+    previous_node = prev_node;
+    position = pos;
+	cost = calculateCost(goal);
 }
 
-std::unique_ptr<Node> Node::getPrev() const
+std::shared_ptr<Node> Node::getPrev() const
 {
-    return std::make_unique<Node>(std::move(previous_node));
+    return previous_node;
 }
 
-void Node::setPrev(std::unique_ptr<Node> prev)
+void Node::setPrev(std::shared_ptr<Node> prev)
 {
-    previous_node = std::move(prev);
+    previous_node = prev;
 }
 
-std::unique_ptr<Vector2> Node::getPos() const
+std::shared_ptr<Vector2> Node::getPos() const
 {
-    return std::make_unique<Vector2>(std::move(position));
+    return position;
 }
 
-void Node::setPos(std::unique_ptr<Vector2> pos)
+void Node::setPos(std::shared_ptr<Vector2> pos)
 {
-    position = std::move(pos);
+    position = pos;
 }
 
 int Node::getSize()
@@ -37,4 +39,9 @@ int Node::getSize()
     if (getPrev() == nullptr)
         return 1;
     return getPrev()->getSize() + 1;
+}
+
+int Node::getCost()
+{
+	return cost;
 }

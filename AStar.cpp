@@ -35,33 +35,26 @@ void AStar::run()
 
 void AStar::astar()
 {
-    // Initialise the deque of potential nodes
-    std::deque<std::unique_ptr<CostNode>> potential_list;
-
     // Initialise the vector of Vector2 positions for explored, inactive nodes
-    Path explored_list;
+    VectorPath explored_list;
 
     // Initial setup for the potential list
-    // And creating the node pointer
-    std::unique_ptr<CostNode> node = std::make_unique<CostNode>(mGoal);
-    node->setPos(std::make_unique<Vector2>(mStart->x, mStart->y));
+    std::vector<std::shared_ptr<Node>> potentialList;
+    potentialList.push_back(std::make_shared<Node>(nullptr, mStart, *mGoal));
 
-    // Pointer to the current node's position
-    std::unique_ptr<Vector2> pos;
-    
-    potential_list.push_front(node);
+    std::shared_ptr<Node> node;
+    std::shared_ptr<Vector2> pos;
 
     // Loop the algorithm until the list is empty (invalid maze), or the algorithm terminates
-    while (!potential_list.empty())
+    while (!potentialList.empty())
     {
         // Increment the numNodes counter
         // Since every loop is an atomic action - an exploration of a node.
         mNumNodes++;
 
-        // Get current node
-        node = std::make_unique<CostNode>(potential_list.front());
-
-        // Points to the current node's position for convenience
+        // Get current node (and pop it)
+        node = potentialList.back();
+        potentialList.pop_back();
         pos = node->getPos();
 
         // Check if the position is the goal early to save one pass
@@ -73,30 +66,41 @@ void AStar::astar()
         }
 
         // Create position vectors for all cardinal directions
-        std::unique_ptr<Vector2> posUp = *pos + *g_UP;
-        std::unique_ptr<Vector2> posDown = *pos + *g_DOWN;
-        std::unique_ptr<Vector2> posLeft = *pos + *g_LEFT;
-        std::unique_ptr<Vector2> posRight = *pos + *g_RIGHT;
+        Vector2 posUp;
+        posUp += *pos;
+        posUp += *g_UP;
+
+        Vector2 posDown;
+        posDown += *pos;
+        posDown += *g_DOWN;
+
+        Vector2 posLeft;
+        posLeft += *pos;
+        posLeft += *g_LEFT;
+
+        Vector2 posRight;
+        posRight += *pos;
+        posRight += *g_RIGHT;
 
         // Calculate whether or not each cardinal direction should be traversed
         // Uses node as a test case by setting its position to said cardinal direction
         bool canGoUp = false;
-		if (!(posUp->y < 0 || mMaze[calculatePosIndex(mMazeType, *posUp)] == WALL))
+		if (!(posUp.y < 0 || mMaze[calculatePosIndex(mMazeType, posUp)] == WALL))
 			canGoUp = true;
 
         bool canGoLeft = false;
-        if (!(posLeft->x < 0 || mMaze[calculatePosIndex(mMazeType, *posLeft)] == WALL))
+        if (!(posLeft.x < 0 || mMaze[calculatePosIndex(mMazeType, posLeft)] == WALL))
             canGoLeft = true;
 
         bool canGoRight = false;
-        if (!(posRight->x >= getCols(mMazeType) || mMaze[calculatePosIndex(mMazeType, *posRight)] == WALL))
+        if (!(posRight.x >= getCols(mMazeType) || mMaze[calculatePosIndex(mMazeType, posRight)] == WALL))
             canGoRight = true;
 
         bool canGoDown = false;
-        if (!(posDown->y >= getRows(mMazeType) || mMaze[calculatePosIndex(mMazeType, *posDown)] == WALL))
+        if (!(posDown.y >= getRows(mMazeType) || mMaze[calculatePosIndex(mMazeType, posDown)] == WALL))
             canGoDown = true;
 
-		std::vector<std::unique_ptr<Vector2>> nextPositions;
+		std::vector<Vector2> nextPositions;
 
         // Calculate which directions need to be added to the potential_list
         // Ensures there are no loops in the path
@@ -123,7 +127,6 @@ void AStar::astar()
 
         // Remove node at the front and put its position in the explored list
         // Placed after goal checking, so that node doesn't get deleted on the final step
-        potential_list.pop_front();
         explored_list.push_back(node->getPos());
 
         // Handle each direction to be added, delete the rest
@@ -131,41 +134,41 @@ void AStar::astar()
         // This ensures the cheapest node is always explored first
 		for (int i = 0; i < nextPositions.size(); i++)
 		{
-			std::unique_ptr<CostNode> next = std::make_unique<CostNode>(node, nextPositions.at(i), mGoal);
-			potential_list.push_front(next);
-			potential_list = insertionSortByCost(potential_list);
+            Vector2 nextPos = nextPositions.at(i);
+            potentialList.push_back(std::make_shared<Node>(node, std::make_shared<Vector2>(nextPos.x, nextPos.y), *mGoal));
+            insertionSortByCost(potentialList);
 		}
+
     }
 
     // Load all positions from the finished node into the path
-    std::unique_ptr<CostNode> node_ptr = node;
+    std::shared_ptr<Node> node_ptr = std::move(node);
+
     while (node_ptr != nullptr)
     {
-        std::unique_ptr<Vector2> pos = node_ptr->getPos();
-        std::unique_ptr<Vector2> vec = std::make_unique<Vector2>(pos->x, pos->y);
-        mPath.push_back(vec);
-        node_ptr = std::static_pointer_cast<CostNode>(node_ptr->getPrev());
+        mPath.push_back(node_ptr->getPos());
+        node_ptr = std::move(node_ptr->getPrev());
     }
     
-    potential_list.clear();
+    potentialList.clear();
 }
 
 
-// Performs one pass of insertion sort to place the front element into its
+// (Inplace) Performs one pass of insertion sort to place the front element into its
 // correct position in the list.
-std::deque<std::unique_ptr<CostNode>> insertionSortByCost(std::deque<std::unique_ptr<CostNode>> &list)
+void insertionSortByCost(std::vector<std::shared_ptr<Node>> &list)
 {
     // Quick exit if necessary
     if (list.size() <= 1)
-        return list;
+        return;
 
-    // Get first node, cost pair in the list, then remove it from the list
-    std::unique_ptr<CostNode> newNode = list.front();
-    int cost = newNode->getCost();
-    list.pop_front();
+    // Get last node in the list (newest added) and now temp points to it.
+    std::shared_ptr<Node> temp = std::move(list.back());
+    int cost = temp->getCost();
 
     // Re-insert the node in the correct position
-    for (int i = 0; i < list.size() - 1; i++)
+    int size = list.size();
+    for (int i = 0; i < size - 1; i++)
     {
         // We want the list to be sorted by cost ascending
         if (cost > list[i]->getCost())
@@ -175,69 +178,58 @@ std::deque<std::unique_ptr<CostNode>> insertionSortByCost(std::deque<std::unique
         // cost <= cost of this index, so insert before this element
         else
         {
-            list.insert(list.begin() + i, newNode);
-            return list;
+            // Put the contents of temp into list[i]
+            // Put the contents of list[i] into list[size-1]
+            // A full swap has now been completed.
+            list[size-1] = std::move(list[i]);
+            list[i] = std::move(temp);
+            return;
         }
     }
-    // The end of the list was reached, so highest cost in the list
-    list.push_back(newNode);
-    return list;
+    // The end of the list was reached, so it stays in place (it has the largest cost)
+    list[size-1] = std::move(temp);
+    return;
 }
 
 
-bool isNodeParentOf(std::unique_ptr<CostNode> potential_parent, std::unique_ptr<CostNode> potential_child)
+bool isNodeParentOf(std::shared_ptr<Node> potential_parent, std::shared_ptr<Node> potential_child)
 {
     // Iterate through every node in node_ptr->getPrev()->...->0
     // Check if node_ptr points to the child
     // If not, continue iterating until the address 0x0 is reached
     // If 0x0 is reached, potential_parent is not a parent of potential_child.
-    auto node_ptr = potential_parent;
-    while (node_ptr != 0)
+    while (potential_parent != nullptr)
     {
-        if (node_ptr == potential_child)
+        if (potential_parent == potential_child)
             return true;
-        node_ptr = std::static_pointer_cast<CostNode>(node_ptr->getPrev());
+        potential_parent = potential_parent->getPrev();
     }
     return false;
 }
 
-// Commented
-bool isAnyNodeParentOf(std::deque<std::shared_ptr<CostNode>> &nodes, std::unique_ptr<CostNode> node)
-{
-    // Iterates through every node in a deque, to see if any are parents of node.
-    for (std::shared_ptr<CostNode> n : nodes)
-    {
-        if (isNodeParentOf(n, node))
-            return true;
-    }
-    return false;
-}
-
-// Commented
-bool hasNodeExplored(CostNode &node, Vector2 &pos)
+bool hasNodeExplored(std::shared_ptr<Node> node, Vector2& pos)
 {
     // Iterate through every node in node_ptr->getPrev()->...->nullptr
     // Check if *node_ptr->getPos() == *pos
     // If not, continue iterating until the address 0x0 is reached
     // If 0x0 is reached, the position has not been explored by this node
     // Casting is necessary as getPrev is an inherited method from Node, returning Node*.
-    auto node_ptr = &node;
-    while (node_ptr != nullptr)
+    while (node != nullptr)
     {
-        if (*node_ptr->getPos() == pos)
+        if (*node->getPos() == pos)
             return true;
-        node_ptr = (CostNode *)node_ptr->getPrev().get();
+        node = node->getPrev();
     }
     return false;
 }
 
-bool isPosInVector(std::unique_ptr<Vector2> pos, Path &vecs)
+bool isPosInVector(Vector2& pos, VectorPath& vecs)
 {
     // Iterate through every Vector2 in the vector, checking if
     // it has the same value as the provided position
-    for (std::shared_ptr<Vector2> vec : vecs)
+    for (int i = 0; i < vecs.size(); i++)
     {
-        if (*pos == *vec)
+        if (pos == *vecs[i])
             return true;
     }
     return false;
