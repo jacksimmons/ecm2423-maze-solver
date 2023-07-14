@@ -8,15 +8,15 @@
 #include "Constants.hpp"
 
 // Assign to the externs in Constants.h
-Vector2 *LEFT = new Vector2(-1, 0);
-Vector2 *UP = new Vector2(0, -1);
-Vector2 *RIGHT = new Vector2(1, 0);
-Vector2 *DOWN = new Vector2(0, 1);
-Vector2 *ZERO = new Vector2(0, 0);
+Vector2 *g_LEFT = new Vector2(-1, 0);
+Vector2 *g_UP = new Vector2(0, -1);
+Vector2 *g_RIGHT = new Vector2(1, 0);
+Vector2 *g_DOWN = new Vector2(0, 1);
+Vector2 *g_ZERO = new Vector2(0, 0);
 
 int main(int argc, char **argv)
 {
-	char maze = 'E';
+	char mazeType = 'E';
 	bool dfs = true;
 	int iterations = 1;
 	bool outputMaze = true;
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 			case 'M':
 			case 'L':
 			case 'V':
-				maze = argMaze[0];
+				mazeType = argMaze[0];
 				break;
 			default:
 				throw 1;
@@ -93,13 +93,13 @@ int main(int argc, char **argv)
 	high_resolution_clock::time_point before = high_resolution_clock::now();
 
     // Run the search algorithms
-	runSolver(maze, dfs, iterations, outputMaze);
+	runSolver(mazeType, dfs, iterations, outputMaze);
 
     // Final garbage collection
-    delete UP;
-    delete DOWN;
-    delete LEFT;
-    delete RIGHT;
+    delete g_UP;
+    delete g_DOWN;
+    delete g_LEFT;
+    delete g_RIGHT;
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);
@@ -111,11 +111,19 @@ void runSolver(char mazeType, bool dfs, int N, bool outputMaze)
 	if (dfs)
 	{
 		for (int i = 0; i < N; i++)
-			runDFS(mazeType, outputMaze);
+		{
+			DFS *dfs = new DFS(mazeType, outputMaze);
+			dfs->run();
+			delete dfs;
+		}
 	}
 	else
 	{
 		for (int i = 0; i < N; i++)
-			runAStar(mazeType, outputMaze);
+		{
+			AStar *as = new AStar(mazeType, outputMaze);
+			as->run();
+			delete as;
+		}
 	}
 }

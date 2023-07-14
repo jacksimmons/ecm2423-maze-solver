@@ -39,6 +39,10 @@ No arguments leads to the default process (Easy, DFS, 1 iteration).
 [OUTPUT_MAZE] default: "true"
     whether to output the maze calculated by the algorithm
 
+[ASTAR_WEIGHT] default: 1
+    changes the weight of the A* heuristic for Vector2s, increasing this improves performance, but
+    sacrifices optimality (it will no longer find the shortest path)
+
 
 Depth-First Search:
 

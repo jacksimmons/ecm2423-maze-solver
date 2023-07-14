@@ -1,0 +1,8 @@
+[14/7] v1.01
+Easy - 550us (1000)
+Medium - 37.7ms 2046v 321f (1000)
+Large - 12.2s (1)
+VLarge - Untested
+
+[14/7] v1.02 - Discovered weighted A* (sub-optimal, but more performant)
+Medium - 6.84ms 522v 327f (1000)

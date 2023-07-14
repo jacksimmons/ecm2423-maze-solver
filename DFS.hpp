@@ -1,9 +1,17 @@
 #include <vector>
 #include <tuple>
 
+#include "SearchAlg.hpp"
 #include "Vector2.hpp"
 #include "Maze.hpp"
 
-// Function templates
-void runDFS(char, bool);
-Path dfs(char, Vector2*, Vector2*, char*, bool*);
+class DFS : public SearchAlg
+{
+private:
+    bool *mVisited;
+public:
+    DFS(char, bool);
+    ~DFS();
+    void run() override;
+    void dfs();
+};

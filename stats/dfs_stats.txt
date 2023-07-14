@@ -1,0 +1,5 @@
+[14/7] v1.02
+Easy - 523us (1000)
+Medium - 20.9ms (1000)
+Large - 181ms (100)
+VLarge - 12.0s (1)

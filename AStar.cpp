@@ -6,65 +6,47 @@
 #include "AStar.hpp"
 #include "Constants.hpp"
 
-// Commented
-void runAStar(char mazeType, bool outputMaze)
+
+AStar::AStar(char mazeType, bool bOutputMazeToFile) : SearchAlg(mazeType, bOutputMazeToFile)
 {
-    // Initialise the maze
-    char* maze;
+    mNumNodes = 0;
+}
 
-    // Initialise the vectors used to control the search
-    Vector2 *start;
-    Vector2 *goal;
-
-    // Read the vectors from the read maze
-    std::tuple<char *, Vector2 *, Vector2 *> mazeInfo = readMaze(mazeType);
-    maze = std::get<0>(mazeInfo);
-    start = std::get<1>(mazeInfo);
-    goal = std::get<2>(mazeInfo);
-
-    // Output the start and end of the maze
-    std::cout << "Start: " << std::endl;
-    Vector2::print(start);
-    std::cout << "Goal: " << std::endl;
-    Vector2::print(goal);
-
-    // Complete the search
-    std::tuple<Path, int> pathData = astar(mazeType, start, goal, maze);
-    Path finalPath = std::get<0>(pathData);
-    int numNodes = std::get<1>(pathData);
-
-    // Output the path and maze to files
-    outputPathToFile("--- A* SEARCH " + getName(mazeType) + " [" + getFilename(mazeType) + "] ---", finalPath);
-    if (outputMaze)
-        outputMazeToFile(mazeType, maze, finalPath);
-
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << numNodes << std::endl;
-    std::cout << "Number of steps in final path: " << finalPath.size() << std::endl;
-
-    // Garbage collection
-    delete[] maze;
-    delete goal;
-
-    while (!finalPath.empty())
+AStar::~AStar()
+{
+    while (!mPath.empty())
     {
-        Vector2 *last = finalPath.back();
-        finalPath.pop_back();
+        Vector2 *last = mPath.back();
+        mPath.pop_back();
         delete last;
     }
 }
 
-
-std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* maze)
+void AStar::run()
 {
-    // Counter for how many nodes are explored
-    int numNodes = 0;
+    // Output the start and end of the maze
+    std::cout << "Start: " << std::endl;
+    Vector2::print(mStart);
+    std::cout << "Goal: " << std::endl;
+    Vector2::print(mGoal);
 
+    // Complete the search
+    this->astar();
+
+    // Output the path and maze to files
+    outputPathToFile("--- A* SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", mPath);
+    if (mOutputMazeToFile)
+        outputMazeToFile(mMazeType, mMaze, mPath);
+
+    // Execution statistics
+    std::cout << "Number of nodes visited: " << mNumNodes << std::endl;
+    std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
+}
+
+void AStar::astar()
+{
     // Pointer to the current node's position
     Vector2 *pos;
-
-    // Initialise the path
-    Path path;
 
     // Initialise the deque of potential nodes
     std::deque<CostNode *> potential_list;
@@ -77,8 +59,8 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
 
     // Initial setup for the potential list
     // And creating the node pointer
-    CostNode *node = new CostNode(goal);
-    node->setPos(start);
+    CostNode *node = new CostNode(mGoal);
+    node->setPos(mStart);
     
     potential_list.push_front(node);
 
@@ -87,7 +69,7 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
     {
         // Increment the numNodes counter
         // Since every loop is an atomic action - an exploration of a node.
-        numNodes++;
+        mNumNodes++;
 
         // Get current node
         node = potential_list.front();
@@ -98,33 +80,33 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
         // Check if the position is the goal early to save one pass
         // If this is the case, the goal has been reached and a path found
         // Terminate the loop
-        if (*pos == *goal)
+        if (*pos == *mGoal)
         {
             break;
         }
 
         // Create position vectors for all cardinal directions
-        Vector2 *posUp = *pos + *UP;
-        Vector2 *posLeft = *pos + *LEFT;
-        Vector2 *posRight = *pos + *RIGHT;
-        Vector2 *posDown = *pos + *DOWN;
+        Vector2 *posUp = *pos + *g_UP;
+        Vector2 *posLeft = *pos + *g_LEFT;
+        Vector2 *posRight = *pos + *g_RIGHT;
+        Vector2 *posDown = *pos + *g_DOWN;
 
         // Calculate whether or not each cardinal direction should be traversed
         // Uses node as a test case by setting its position to said cardinal direction
         bool canGoUp = false;
-		if (!(posUp->y < 0 || maze[calculatePosIndex(mazeType, posUp)] == WALL))
+		if (!(posUp->y < 0 || mMaze[calculatePosIndex(mMazeType, posUp)] == WALL))
 			canGoUp = true;
 
         bool canGoLeft = false;
-        if (!(posLeft->x < 0 || maze[calculatePosIndex(mazeType, posLeft)] == WALL))
+        if (!(posLeft->x < 0 || mMaze[calculatePosIndex(mMazeType, posLeft)] == WALL))
             canGoLeft = true;
 
         bool canGoRight = false;
-        if (!(posRight->x >= getCols(mazeType) || maze[calculatePosIndex(mazeType, posRight)] == WALL))
+        if (!(posRight->x >= getCols(mMazeType) || mMaze[calculatePosIndex(mMazeType, posRight)] == WALL))
             canGoRight = true;
 
         bool canGoDown = false;
-        if (!(posDown->y >= getRows(mazeType) || maze[calculatePosIndex(mazeType, posDown)] == WALL))
+        if (!(posDown->y >= getRows(mMazeType) || mMaze[calculatePosIndex(mMazeType, posDown)] == WALL))
             canGoDown = true;
 
 		Path nextPositions;
@@ -162,7 +144,7 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
         // This ensures the cheapest node is always explored first
 		for (int i = 0; i < nextPositions.size(); i++)
 		{
-			CostNode* next = new CostNode(node, nextPositions.at(i), goal);
+			CostNode* next = new CostNode(node, nextPositions.at(i), mGoal);
 			potential_list.push_front(next);
 			potential_list = insertionSortByCost(potential_list);
 			hierarchy_queue.push(next);
@@ -175,7 +157,7 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
     {
         Vector2 *pos = node_ptr->getPos();
         Vector2 *vec = new Vector2(pos->x, pos->y);
-        path.push_back(vec);
+        mPath.push_back(vec);
         node_ptr = (CostNode *)node_ptr->getPrev();
     }
 
@@ -198,9 +180,6 @@ std::tuple<Path, int> astar(char mazeType, Vector2 *start, Vector2 *goal, char* 
     }
     
     potential_list.clear();
-
-    // Termination of the algorithm and return to runAStar
-    return std::make_tuple(path, numNodes);
 }
 
 

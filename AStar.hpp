@@ -4,16 +4,18 @@
 
 #include "Vector2.hpp"
 #include "CostNode.hpp"
-#include "CostNode.hpp"
+#include "SearchAlg.hpp"
 #include "Maze.hpp"
 
-// Function templates
-
-// Sets up and starts the A* search algorithm.
-void runAStar(char, bool);
-
-// Runs the A* search algorithm.
-std::tuple<Path, int> astar(char, Vector2*, Vector2*, char*);
+class AStar : public SearchAlg {
+private:
+    int mNumNodes;
+public:
+    AStar(char, bool);
+    ~AStar();
+    void run() override;
+    void astar();
+};
 
 // Carries out one pass of an insertion sort, to get a priority queue structure for potential_list.
 std::deque<CostNode *> insertionSortByCost(std::deque<CostNode *> &list);
