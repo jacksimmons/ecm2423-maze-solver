@@ -1,4 +1,5 @@
 #include <vector>
+#include <list>
 #include <deque>
 #include <tuple>
 
@@ -19,7 +20,7 @@ public:
 };
 
 // Carries out one pass of an insertion sort, to get a priority queue structure for potential_list.
-void insertionSortByCost(std::vector<std::shared_ptr<Node>>&);
+void insertionSortByCost(std::deque<std::shared_ptr<Node>>&);
 
 // Returns true if the first argument is higher up in the parent hierarchy.
 // Meaning if the first argument is a parent, grandparent, etc. of the second.

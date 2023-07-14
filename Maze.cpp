@@ -100,7 +100,7 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, s
         {
             // Empty by default
             char c = '-';
-            std::unique_ptr<Vector2> pos = std::make_unique<Vector2>(j, i);
+            Vector2 pos(j, i);
             if (maze[i * getCols(mazeType) + j] == WALL)
                 c = '#';
             else
@@ -114,7 +114,7 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, s
                 // Overwrite the above if on the path with *
                 for (int i = 0; i < path.size(); i++)
                 {
-                    if (*pos == *path[i])
+                    if (pos == *path[i])
                     {
                         c = '*';
                     }
@@ -126,6 +126,8 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, s
         // Newline for next row
         file << std::endl;
     }
+
+    file.close();
 }
 
 
@@ -136,7 +138,7 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path)
     std::vector<bool> visited;
     for (int i = 0; i < getCols(mazeType); i++)
     {
-        for (int j = 0; i < getRows(mazeType); j++)
+        for (int j = 0; j < getRows(mazeType); j++)
         {
             visited.push_back(false);
         }

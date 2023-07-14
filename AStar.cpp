@@ -39,8 +39,8 @@ void AStar::astar()
     VectorPath explored_list;
 
     // Initial setup for the potential list
-    std::vector<std::shared_ptr<Node>> potentialList;
-    potentialList.push_back(std::make_shared<Node>(nullptr, mStart, *mGoal));
+    std::deque<std::shared_ptr<Node>> potentialList;
+    potentialList.push_front(std::make_shared<Node>(nullptr, mStart, *mGoal));
 
     std::shared_ptr<Node> node;
     std::shared_ptr<Vector2> pos;
@@ -52,9 +52,8 @@ void AStar::astar()
         // Since every loop is an atomic action - an exploration of a node.
         mNumNodes++;
 
-        // Get current node (and pop it)
-        node = potentialList.back();
-        potentialList.pop_back();
+        // Get current node
+        node = potentialList.front();
         pos = node->getPos();
 
         // Check if the position is the goal early to save one pass
@@ -127,6 +126,7 @@ void AStar::astar()
 
         // Remove node at the front and put its position in the explored list
         // Placed after goal checking, so that node doesn't get deleted on the final step
+        potentialList.pop_front();
         explored_list.push_back(node->getPos());
 
         // Handle each direction to be added, delete the rest
@@ -135,10 +135,9 @@ void AStar::astar()
 		for (int i = 0; i < nextPositions.size(); i++)
 		{
             Vector2 nextPos = nextPositions.at(i);
-            potentialList.push_back(std::make_shared<Node>(node, std::make_shared<Vector2>(nextPos.x, nextPos.y), *mGoal));
+            potentialList.push_front(std::make_shared<Node>(node, std::make_shared<Vector2>(nextPos.x, nextPos.y), *mGoal));
             insertionSortByCost(potentialList);
 		}
-
     }
 
     // Load all positions from the finished node into the path
@@ -156,19 +155,21 @@ void AStar::astar()
 
 // (Inplace) Performs one pass of insertion sort to place the front element into its
 // correct position in the list.
-void insertionSortByCost(std::vector<std::shared_ptr<Node>> &list)
+// Sorts the list in ascending cost order, so that the back element has the highest cost.
+void insertionSortByCost(std::deque<std::shared_ptr<Node>> &list)
 {
     // Quick exit if necessary
     if (list.size() <= 1)
         return;
 
     // Get last node in the list (newest added) and now temp points to it.
-    std::shared_ptr<Node> temp = std::move(list.back());
+    std::shared_ptr<Node> temp = std::move(list.front());
+    list.pop_front();
     int cost = temp->getCost();
 
     // Re-insert the node in the correct position
     int size = list.size();
-    for (int i = 0; i < size - 1; i++)
+    for (int i = 0; i < size; i++)
     {
         // We want the list to be sorted by cost ascending
         if (cost > list[i]->getCost())
@@ -178,16 +179,12 @@ void insertionSortByCost(std::vector<std::shared_ptr<Node>> &list)
         // cost <= cost of this index, so insert before this element
         else
         {
-            // Put the contents of temp into list[i]
-            // Put the contents of list[i] into list[size-1]
-            // A full swap has now been completed.
-            list[size-1] = std::move(list[i]);
-            list[i] = std::move(temp);
+            list.insert(list.begin() + i, std::move(temp));
             return;
         }
     }
-    // The end of the list was reached, so it stays in place (it has the largest cost)
-    list[size-1] = std::move(temp);
+    // The end of the list was reached, and no elements had a higher cost.
+    list.push_back(std::move(temp));
     return;
 }
 

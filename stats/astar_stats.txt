@@ -4,7 +4,11 @@ Medium - 37.7ms (1000)
 Large - 12.2s (1)
 VLarge - Untested
 
+Must have (optimality):
+Easy - 27 steps (yes)
+Medium - 321 steps
+
 v1.03 - smart pointers (speed decrease in exchange for memory safety)
-Easy - 807us (100)
-Medium - 107ms (1000)
-Large - 26.9s (1)
+Easy - 800us (100)
+Medium - 52.1ms (100)
+Large - 7.04s (1)
