@@ -1,12 +1,13 @@
 #ifndef MAZE_H
 #define MAZE_H 1
 
+#include <memory>
 #include <vector>
 #include <tuple>
 #include <string>
 
 #include "Vector2.hpp"
-#include "Typedef.hpp"
+#include "SearchAlg.hpp"
 
 // Define the maze macros
 #define E_COLS 20
@@ -35,11 +36,8 @@
 
 // Function templates
 std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char);
-std::unique_ptr<Vector2> calculatePos(SharedPath&, int);
+std::unique_ptr<Vector2> calculatePos(DFSPath&, int);
 int calculatePosIndex(char, Vector2&);
-void outputPathToFile(std::string header, SharedPath&);
-void outputMazeToFile(char, std::vector<char>, SharedPath&, std::vector<bool>);
-void outputMazeToFile(char, std::vector<char>, SharedPath&);
 
 int getCols(char);
 int getRows(char);

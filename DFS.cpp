@@ -30,6 +30,9 @@ void DFS::run()
     // Complete the search
     this->dfs();
 
+    // Remove the duplicate start element
+    mPath.pop_front();
+
     // // directionPath contains the start position, followed by a series of directions.
     // // The sum of all directions up to index i gives the intended position at that index.
     // // Final path output (converting a vector of cardinal directions into one of positions)
@@ -40,9 +43,9 @@ void DFS::run()
     // }
 
     // File output
-	outputPathToFile("--- DFS SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", mPath);
+	outputPathToFile();
     if (mOutputMazeToFile)
-        outputMazeToFile(mMazeType, mMaze, mPath, mVisited);
+        outputMazeToFile();
 
 	// Calculate the number of visited nodes
 	int numNodes = 0;
@@ -69,7 +72,7 @@ void DFS::dfs()
     std::shared_ptr<Vector2> pos = std::make_shared<Vector2>(mStart->x, mStart->y);
 
     // Push ZERO to start the path
-    mPath.push_back(std::make_shared<Vector2>());
+    mPath.push_back(pos);
 
     while (!mPath.empty())
     {
@@ -155,4 +158,60 @@ void DFS::dfs()
 
         }
     }
+}
+
+void DFS::outputPathToFile()
+{
+    std::string fileName = "PathOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+    file << "--- DFS SEARCH " << getName(mMazeType) << "[" << getFilename(mMazeType) << "]" << std::endl;
+    // Print each position in (x,y) format
+    for (int i = 0; i < mPath.size(); i++)
+    {
+        file << "(" << mPath[i]->x << ", " << mPath[i]->y << ")" << std::endl;
+    }
+    file.close();
+}
+
+void DFS::outputMazeToFile()
+{
+    std::string fileName = "MazeOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+
+    // Iterate over every character in the maze array
+    for (int i = 0; i < getRows(mMazeType); i++)
+    {
+        for (int j = 0; j < getCols(mMazeType); j++)
+        {
+            // Empty by default
+            char c = '-';
+            Vector2 pos(j, i);
+            if (mMaze[i * getCols(mMazeType) + j] == WALL)
+                c = '#';
+            else
+            {
+                if (mVisited[i * getCols(mMazeType) + j])
+                    c = 'v';
+                else
+                    c = '-';
+
+                // Overwrite the above if on the path with *
+                for (int i = 0; i < mPath.size(); i++)
+                {
+                    if (pos == *mPath[i])
+                    {
+                        c = '*';
+                    }
+                }
+            }
+            // Output the character c to file
+            file << c;
+        }
+        // Newline for next row
+        file << std::endl;
+    }
+
+    file.close();
 }

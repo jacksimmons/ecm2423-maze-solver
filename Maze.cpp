@@ -1,10 +1,8 @@
-#include <fstream>
 #include <tuple>
+#include <vector>
+#include <fstream>
 
 #include "Maze.hpp"
-#include <memory>
-#include <vector>
-
 #include "Vector2.hpp"
 
 
@@ -55,7 +53,7 @@ std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>
 
 
 // Get the ith element of the path, and return its vector form
-std::unique_ptr<Vector2> calculatePos(SharedPath& path, int index)
+std::unique_ptr<Vector2> calculatePos(DFSPath& path, int index)
 {
     std::unique_ptr<Vector2> pos = std::make_unique<Vector2>();
     for (int i = 0; i <= index; i++)
@@ -68,83 +66,6 @@ std::unique_ptr<Vector2> calculatePos(SharedPath& path, int index)
 int calculatePosIndex(char mazeType, Vector2& pos)
 {
     return (pos.y) * getCols(mazeType) + pos.x;
-}
-
-
-// Output the path to PathOutput.txt
-void outputPathToFile(std::string header, SharedPath& path)
-{
-    std::string fileName = "PathOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
-    file << header << std::endl;
-    // Print each position in (x,y) format
-    for (int i = path.size() - 1; i >= 0; i--)
-    {
-        file << "(" << path[i]->x << ", " << path[i]->y << ")" << std::endl;
-    }
-    file.close();
-}
-
-
-void outputMazeToFile(char mazeType, std::vector<char> maze, SharedPath& path, std::vector<bool> visited)
-{
-    std::string fileName = "MazeOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
-
-    // Iterate over every character in the maze array
-    for (int i = 0; i < getRows(mazeType); i++)
-    {
-        for (int j = 0; j < getCols(mazeType); j++)
-        {
-            // Empty by default
-            char c = '-';
-            Vector2 pos(j, i);
-            if (maze[i * getCols(mazeType) + j] == WALL)
-                c = '#';
-            else
-            {
-                // Visited nodes marked v
-                if (visited[i * getCols(mazeType) + j])
-                    c = 'v';
-                else
-                    c = '-';
-
-                // Overwrite the above if on the path with *
-                for (int i = 0; i < path.size(); i++)
-                {
-                    if (pos == *path[i])
-                    {
-                        c = '*';
-                    }
-                }
-            }
-            // Output the character c to file
-            file << c;
-        }
-        // Newline for next row
-        file << std::endl;
-    }
-
-    file.close();
-}
-
-
-// Output maze when a visited array is not present
-void outputMazeToFile(char mazeType, std::vector<char> maze, SharedPath& path)
-{
-    // Make new visited array and fill it with false
-    std::vector<bool> visited;
-    for (int i = 0; i < getCols(mazeType); i++)
-    {
-        for (int j = 0; j < getRows(mazeType); j++)
-        {
-            visited.push_back(false);
-        }
-    }
-        
-    outputMazeToFile(mazeType, maze, path, visited);
 }
 
 

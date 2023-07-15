@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <queue>
+#include <fstream>
 
 #include <math.h>
 
@@ -24,9 +25,9 @@ void AStar::run()
     this->astar();
 
     // Output the path and maze to files
-    outputPathToFile("--- A* SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", mPath);
+    outputPathToFile();
     if (mOutputMazeToFile)
-        outputMazeToFile(mMazeType, mMaze, mPath);
+        outputMazeToFile();
 
     // Execution statistics
     std::cout << "Number of nodes visited: " << mNumNodes << std::endl;
@@ -36,7 +37,7 @@ void AStar::run()
 void AStar::astar()
 {
     // Initialise the vector of Vector2 positions for explored, inactive nodes
-    SharedPath explored_list;
+    AStarPath explored_list;
 
     // Initial setup for the potential list
     std::deque<std::shared_ptr<Node>> potentialList;
@@ -152,6 +153,60 @@ void AStar::astar()
     potentialList.clear();
 }
 
+// Output the path to PathOutput.txt
+void AStar::outputPathToFile()
+{
+    std::string fileName = "PathOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+    file << "--- A* SEARCH " << getName(mMazeType) << "[" << getFilename(mMazeType) << "]" << std::endl;
+    // Print each position in (x,y) format
+    for (int i = mPath.size() - 1; i >= 0; i--)
+    {
+        file << "(" << mPath[i]->x << ", " << mPath[i]->y << ")" << std::endl;
+    }
+    file.close();
+}
+
+void AStar::outputMazeToFile()
+{
+    std::string fileName = "MazeOutput.txt";
+    std::ofstream file;
+    file.open(fileName);
+
+    // Iterate over every character in the maze array
+    for (int i = 0; i < getRows(mMazeType); i++)
+    {
+        for (int j = 0; j < getCols(mMazeType); j++)
+        {
+            // Empty by default
+            char c = '-';
+            Vector2 pos(j, i);
+            if (mMaze[i * getCols(mMazeType) + j] == WALL)
+                c = '#';
+            else
+            {
+                c = '-';
+
+                // Overwrite the above if on the path with *
+                for (int i = 0; i < mPath.size(); i++)
+                {
+                    if (pos == *mPath[i])
+                    {
+                        c = '*';
+                    }
+                }
+            }
+            // Output the character c to file
+            file << c;
+        }
+        // Newline for next row
+        file << std::endl;
+    }
+
+    file.close();
+}
+
 
 // (Inplace) Performs one pass of insertion sort to place the front element into its
 // correct position in the list.
@@ -220,7 +275,7 @@ bool hasNodeExplored(std::shared_ptr<Node> node, Vector2& pos)
     return false;
 }
 
-bool isPosInVector(Vector2& pos, SharedPath& vecs)
+bool isPosInVector(Vector2& pos, AStarPath& vecs)
 {
     // Iterate through every Vector2 in the vector, checking if
     // it has the same value as the provided position

@@ -1,3 +1,6 @@
+Format:
+Size - Time / Nodes visited / Nodes in final path
+
 Must have (optimality):
 Easy - 27 steps
 Medium - 321 steps
@@ -5,13 +8,13 @@ Large - 974 steps
 VLarge - 3691 steps (assumed correct)
 
 [14/7] v1.01 / v1.02 classes
-Easy - 550us (1000)
-Medium - 37.7ms 
-Large - 12.2s / 41618
+Easy - 550us / 36 / 27
+Medium - 37.7ms / 2046 / 321
+Large - 12.2s / 41618 / 974
 VLarge - Untested
 
 v1.03 - smart pointers
-Easy - 800us (100)
-Medium - 52.1ms (100)
+Easy - 800us / 31 / 27
+Medium - 57.7ms / 2046 / 321
 Large - 7.04s / 41900
 VLarge - 296s / 273931

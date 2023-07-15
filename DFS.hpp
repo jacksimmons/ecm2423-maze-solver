@@ -12,9 +12,11 @@ class DFS : public SearchAlg
 {
 private:
     std::vector<bool> mVisited;
-    SharedPath mPath;
+    DFSPath mPath;
 public:
     DFS(char, bool);
     void run() override;
     void dfs();
+    void outputPathToFile() override;
+    void outputMazeToFile() override;
 };

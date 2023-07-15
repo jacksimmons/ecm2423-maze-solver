@@ -7,16 +7,17 @@
 #include "Node.hpp"
 #include "SearchAlg.hpp"
 #include "Maze.hpp"
-#include "Typedef.hpp"
 
 class AStar : public SearchAlg {
 private:
     int mNumNodes;
-    SharedPath mPath;
+    AStarPath mPath;
 public:
     AStar(char, bool);
     void run() override;
     void astar();
+    void outputPathToFile() override;
+    void outputMazeToFile() override;
 };
 
 // Carries out one pass of an insertion sort, to get a priority queue structure for potential_list.
@@ -30,4 +31,6 @@ bool isNodeParentOf(std::shared_ptr<Node>, std::shared_ptr<Node>);
 bool hasNodeExplored(std::shared_ptr<Node>, Vector2&);
 
 // Returns true if the std::unique_ptr<Vector2> is present in the vector<std::unique_ptr<Vector2>>.
-bool isPosInVector(Vector2&, SharedPath&);
+bool isPosInVector(Vector2&, AStarPath&);
+
+void outputPathToFile(std::string header, std::vector<std::shared_ptr<Vector2>>&);
