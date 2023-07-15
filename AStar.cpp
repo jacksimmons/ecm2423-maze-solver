@@ -36,7 +36,7 @@ void AStar::run()
 void AStar::astar()
 {
     // Initialise the vector of Vector2 positions for explored, inactive nodes
-    VectorPath explored_list;
+    SharedPath explored_list;
 
     // Initial setup for the potential list
     std::deque<std::shared_ptr<Node>> potentialList;
@@ -220,7 +220,7 @@ bool hasNodeExplored(std::shared_ptr<Node> node, Vector2& pos)
     return false;
 }
 
-bool isPosInVector(Vector2& pos, VectorPath& vecs)
+bool isPosInVector(Vector2& pos, SharedPath& vecs)
 {
     // Iterate through every Vector2 in the vector, checking if
     // it has the same value as the provided position

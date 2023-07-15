@@ -1,9 +1,14 @@
+Format:
+Size - Time / Nodes visited / Nodes in final path
+
 [14/7] v1.01 / v1.02 classes
 Easy - 523us (1000)
 Medium - 20.9ms (1000)
 Large - 181ms (100)
 VLarge - 12.0s (1)
 
-v1.03 - smart pointers (speed decrease in exchange for memory safety)
-Easy - 842us (10000)
-Medium - 71.3ms (100)
+v1.03 - smart pointers
+Easy - 786us / 76 / 28
+Medium - 12.2ms / 4871 / 450
+Large - 55.0ms / 22371 / 1121
+VLarge - 899ms / 468365 / 3746 (10x improvement!)

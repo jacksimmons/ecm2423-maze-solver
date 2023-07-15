@@ -30,10 +30,6 @@ void DFS::run()
     // Complete the search
     this->dfs();
 
-    VectorPath path;
-    for (int i = 0; i < mPath.size(); i++)
-        path.push_back(std::move(mPath.top()));
-
     // // directionPath contains the start position, followed by a series of directions.
     // // The sum of all directions up to index i gives the intended position at that index.
     // // Final path output (converting a vector of cardinal directions into one of positions)
@@ -44,9 +40,9 @@ void DFS::run()
     // }
 
     // File output
-	outputPathToFile("--- DFS SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", path);
+	outputPathToFile("--- DFS SEARCH " + getName(mMazeType) + " [" + getFilename(mMazeType) + "] ---", mPath);
     if (mOutputMazeToFile)
-        outputMazeToFile(mMazeType, mMaze, path, mVisited);
+        outputMazeToFile(mMazeType, mMaze, mPath, mVisited);
 
 	// Calculate the number of visited nodes
 	int numNodes = 0;
@@ -60,7 +56,7 @@ void DFS::run()
 
 	// Execution statistics
 	std::cout << "Number of nodes visited: " << numNodes << std::endl;
-	std::cout << "Number of steps in final path: " << path.size() << std::endl;
+	std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
 }
 
 void DFS::dfs()
@@ -70,29 +66,23 @@ void DFS::dfs()
 
     // Initialise direction and pos
     std::unique_ptr<Vector2> direction = std::make_unique<Vector2>();
-    std::unique_ptr<Vector2> pos = std::make_unique<Vector2>(mStart->x, mStart->y); // Copy start into pos
+    std::shared_ptr<Vector2> pos = std::make_shared<Vector2>(mStart->x, mStart->y);
 
-    // Push the start to start the path
-    mPath.push(std::make_unique<Vector2>(mStart->x, mStart->y));
+    // Push ZERO to start the path
+    mPath.push_back(std::make_shared<Vector2>());
 
     while (!mPath.empty())
     {
         // Check if the direction has been assigned, if not calculate it
         if (Vector2::isZero(*direction))
         {
-            // No direction has been assigned, so we are backtracking.
-
-            // Move top element into pos and pop from the stack
-            pos = std::move(mPath.top());
-            mPath.pop();
-
             // The next direction to travel in
             Vector2 selectedDir;
 
-            // Initialise positions in every cardinal direction from pos
+            // Create position vectors for all cardinal directions
             std::unique_ptr<Vector2> posUp = *pos + *g_UP;
-            std::unique_ptr<Vector2> posLeft = *pos + *g_LEFT;
             std::unique_ptr<Vector2> posDown = *pos + *g_DOWN;
+            std::unique_ptr<Vector2> posLeft = *pos + *g_LEFT;
             std::unique_ptr<Vector2> posRight = *pos + *g_RIGHT;
 
             // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
@@ -111,6 +101,10 @@ void DFS::dfs()
                 // This is the BREADTH part of the search (Depth first, then Breadth)
                 selectedDir = *g_ZERO;
                 mVisited[calculatePosIndex(mMazeType, *pos)] = true;
+
+                // Move back element into pos and pop from the stack
+                pos = std::move(mPath.back());
+                mPath.pop_back();
             }
             
             // The direction has been set, need to restart block
@@ -122,41 +116,43 @@ void DFS::dfs()
             // A proper direction has been assigned, so check if that direction leads into a wall, backtrack if so
             // This is the DEPTH part; a direction has been assigned, and we travel along it until a wall is reached, where the direction is removed.
             // When the direction is removed, the above block (BREADTH and BACKTRACKING) begins
+
             std::unique_ptr<Vector2> posPlusDirection = *pos + *direction;
 
             bool adjacent_in_maze_bounds = posPlusDirection->x >= 0 && posPlusDirection->y >= 0 && posPlusDirection->x <= getCols(mMazeType)-1 && posPlusDirection->y <= getRows(mMazeType)-1;
 
-            // Check if the next node is in the maze
-            if (adjacent_in_maze_bounds)
-            {
-                bool adjacent_not_wall = (mMaze[calculatePosIndex(mMazeType, *posPlusDirection)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posPlusDirection)]);
-                // If the adjacent node is not a wall, we can assign to the adjacent std::vector
-                if (adjacent_not_wall)
-                {
-                    // Push pos onto the stack, and assign posPlusDirection to pos
-                    mPath.push(std::move(pos));
-                    pos = std::move(posPlusDirection);
-
-                    // Note that this node has been visited
-                    mVisited[calculatePosIndex(mMazeType, *pos)] = true;
-                }
-                else
-                {
-                    direction->set(0, 0);
-                    continue;
-                }
-            }
             // If it isn't EMPTY (i.e. is a wall), we need to change the direction or backtrack (both are handled by resetting the direction)
-            else
+            if (!adjacent_in_maze_bounds)
             {
                 // If the next position isn't in the maze bounds, the position is at the goal or an invalid maze was provided
                 // This is because the only place to go from the goal is out of bounds
                 if (*pos == *mGoal)
                 {
                     std::cout << "Found the goal!" << std::endl;
+                    mPath.push_back(std::move(pos));
                     break;
                 }
             }
+            // Check if the next node is in the maze
+            else
+            {
+                bool adjacent_valid = mMaze[calculatePosIndex(mMazeType, *posPlusDirection)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posPlusDirection)];
+                // If the adjacent node is not a wall, and hasn't been visited, we can add it to the path.
+                if (adjacent_valid)
+                {
+                    // Note that pos has been visited
+                    mVisited[calculatePosIndex(mMazeType, *pos)] = true;
+
+                    // Push pos onto the stack, and assign posPlusDirection to pos
+                    mPath.push_back(std::move(pos));
+                    pos = std::move(posPlusDirection);
+                }
+                else
+                {
+                    direction->set(0, 0);
+                }
+            }
+
         }
     }
 }

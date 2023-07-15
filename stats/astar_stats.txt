@@ -1,14 +1,17 @@
+Must have (optimality):
+Easy - 27 steps
+Medium - 321 steps
+Large - 974 steps
+VLarge - 3691 steps (assumed correct)
+
 [14/7] v1.01 / v1.02 classes
 Easy - 550us (1000)
-Medium - 37.7ms (1000)
-Large - 12.2s (1)
+Medium - 37.7ms 
+Large - 12.2s / 41618
 VLarge - Untested
 
-Must have (optimality):
-Easy - 27 steps (yes)
-Medium - 321 steps
-
-v1.03 - smart pointers (speed decrease in exchange for memory safety)
+v1.03 - smart pointers
 Easy - 800us (100)
 Medium - 52.1ms (100)
-Large - 7.04s (1)
+Large - 7.04s / 41900
+VLarge - 296s / 273931

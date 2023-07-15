@@ -11,8 +11,8 @@
 class DFS : public SearchAlg
 {
 private:
-    StackPath mPath;
     std::vector<bool> mVisited;
+    SharedPath mPath;
 public:
     DFS(char, bool);
     void run() override;

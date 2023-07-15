@@ -35,11 +35,11 @@
 
 // Function templates
 std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char);
-std::unique_ptr<Vector2> calculatePos(VectorPath&, int);
+std::unique_ptr<Vector2> calculatePos(SharedPath&, int);
 int calculatePosIndex(char, Vector2&);
-void outputPathToFile(std::string header, VectorPath&);
-void outputMazeToFile(char, std::vector<char>, VectorPath&, std::vector<bool>);
-void outputMazeToFile(char, std::vector<char>, VectorPath&);
+void outputPathToFile(std::string header, SharedPath&);
+void outputMazeToFile(char, std::vector<char>, SharedPath&, std::vector<bool>);
+void outputMazeToFile(char, std::vector<char>, SharedPath&);
 
 int getCols(char);
 int getRows(char);

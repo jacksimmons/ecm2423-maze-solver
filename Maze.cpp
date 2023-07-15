@@ -55,7 +55,7 @@ std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>
 
 
 // Get the ith element of the path, and return its vector form
-std::unique_ptr<Vector2> calculatePos(VectorPath& path, int index)
+std::unique_ptr<Vector2> calculatePos(SharedPath& path, int index)
 {
     std::unique_ptr<Vector2> pos = std::make_unique<Vector2>();
     for (int i = 0; i <= index; i++)
@@ -72,7 +72,7 @@ int calculatePosIndex(char mazeType, Vector2& pos)
 
 
 // Output the path to PathOutput.txt
-void outputPathToFile(std::string header, VectorPath& path)
+void outputPathToFile(std::string header, SharedPath& path)
 {
     std::string fileName = "PathOutput.txt";
     std::ofstream file;
@@ -87,7 +87,7 @@ void outputPathToFile(std::string header, VectorPath& path)
 }
 
 
-void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, std::vector<bool> visited)
+void outputMazeToFile(char mazeType, std::vector<char> maze, SharedPath& path, std::vector<bool> visited)
 {
     std::string fileName = "MazeOutput.txt";
     std::ofstream file;
@@ -132,7 +132,7 @@ void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path, s
 
 
 // Output maze when a visited array is not present
-void outputMazeToFile(char mazeType, std::vector<char> maze, VectorPath& path)
+void outputMazeToFile(char mazeType, std::vector<char> maze, SharedPath& path)
 {
     // Make new visited array and fill it with false
     std::vector<bool> visited;

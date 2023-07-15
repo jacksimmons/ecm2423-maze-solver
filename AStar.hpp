@@ -12,7 +12,7 @@
 class AStar : public SearchAlg {
 private:
     int mNumNodes;
-    VectorPath mPath;
+    SharedPath mPath;
 public:
     AStar(char, bool);
     void run() override;
@@ -30,4 +30,4 @@ bool isNodeParentOf(std::shared_ptr<Node>, std::shared_ptr<Node>);
 bool hasNodeExplored(std::shared_ptr<Node>, Vector2&);
 
 // Returns true if the std::unique_ptr<Vector2> is present in the vector<std::unique_ptr<Vector2>>.
-bool isPosInVector(Vector2&, VectorPath&);
+bool isPosInVector(Vector2&, SharedPath&);
