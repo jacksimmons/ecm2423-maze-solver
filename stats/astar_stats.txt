@@ -18,3 +18,9 @@ Easy - 800us / 31 / 27
 Medium - 57.7ms / 2046 / 321
 Large - 7.04s / 41900
 VLarge - 296s / 273931
+
+v1.04 - eliminated Vector2
+Easy - 578us / 35 / 27
+Medium - 9.19ms / 2009 / 321
+Large - 291ms / 67073 / 1092 (?)
+VLarge - 6.46s / 863014 / 3691

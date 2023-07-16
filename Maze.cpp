@@ -1,6 +1,7 @@
 #include <tuple>
 #include <vector>
 #include <fstream>
+#include <cmath>
 
 #include "Maze.hpp"
 #include "Vector2.hpp"
@@ -63,9 +64,17 @@ std::unique_ptr<Vector2> calculatePos(DFSPath& path, int index)
 
 
 // Convert vector to index of maze array
-int calculatePosIndex(char mazeType, Vector2& pos)
+int posToIndex(char mazeType, Vector2& pos)
 {
     return (pos.y) * getCols(mazeType) + pos.x;
+}
+
+
+float getIndexDistance(int i1, int i2, int cols)
+{
+    int dx = (i1 - i2) % cols;
+    int dy = (i1 - i2) / cols;
+    return abs(dx) + abs(dy);
 }
 
 

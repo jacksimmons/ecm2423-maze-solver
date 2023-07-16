@@ -37,7 +37,8 @@
 // Function templates
 std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char);
 std::unique_ptr<Vector2> calculatePos(DFSPath&, int);
-int calculatePosIndex(char, Vector2&);
+int posToIndex(char, Vector2&);
+float getIndexDistance(int i1, int i2, int cols);
 
 int getCols(char);
 int getRows(char);

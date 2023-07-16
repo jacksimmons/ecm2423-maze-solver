@@ -65,7 +65,7 @@ void DFS::run()
 void DFS::dfs()
 {
     // Mark starting node as visited as we start here
-    mVisited[calculatePosIndex(mMazeType, *mStart)] = true;
+    mVisited[posToIndex(mMazeType, *mStart)] = true;
 
     // Initialise direction and pos
     std::unique_ptr<Vector2> direction = std::make_unique<Vector2>();
@@ -90,20 +90,20 @@ void DFS::dfs()
 
             // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
             // ! Prefers UP !
-            if (pos->y > 0 && mMaze[calculatePosIndex(mMazeType, *posUp)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posUp)])
+            if (pos->y > 0 && mMaze[posToIndex(mMazeType, *posUp)] != WALL && !mVisited[posToIndex(mMazeType, *posUp)])
                 selectedDir = *g_UP;
-            else if (pos->x > 0 && mMaze[calculatePosIndex(mMazeType, *posLeft)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posLeft)])
+            else if (pos->x > 0 && mMaze[posToIndex(mMazeType, *posLeft)] != WALL && !mVisited[posToIndex(mMazeType, *posLeft)])
                 selectedDir = *g_LEFT;
-            else if (pos->y < getRows(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, *posDown)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posDown)])
+            else if (pos->y < getRows(mMazeType)-1 && mMaze[posToIndex(mMazeType, *posDown)] != WALL && !mVisited[posToIndex(mMazeType, *posDown)])
                 selectedDir = *g_DOWN;
-			else if (pos->x < getCols(mMazeType)-1 && mMaze[calculatePosIndex(mMazeType, *posRight)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posRight)])
+			else if (pos->x < getCols(mMazeType)-1 && mMaze[posToIndex(mMazeType, *posRight)] != WALL && !mVisited[posToIndex(mMazeType, *posRight)])
                 selectedDir = *g_RIGHT;
             else
             {
                 // No direction has been assigned, and none are possible (or beneficial), so we backtrack until one is found.
                 // This is the BREADTH part of the search (Depth first, then Breadth)
                 selectedDir = *g_ZERO;
-                mVisited[calculatePosIndex(mMazeType, *pos)] = true;
+                mVisited[posToIndex(mMazeType, *pos)] = true;
 
                 // Move back element into pos and pop from the stack
                 pos = std::move(mPath.back());
@@ -139,12 +139,12 @@ void DFS::dfs()
             // Check if the next node is in the maze
             else
             {
-                bool adjacent_valid = mMaze[calculatePosIndex(mMazeType, *posPlusDirection)] != WALL && !mVisited[calculatePosIndex(mMazeType, *posPlusDirection)];
+                bool adjacent_valid = mMaze[posToIndex(mMazeType, *posPlusDirection)] != WALL && !mVisited[posToIndex(mMazeType, *posPlusDirection)];
                 // If the adjacent node is not a wall, and hasn't been visited, we can add it to the path.
                 if (adjacent_valid)
                 {
                     // Note that pos has been visited
-                    mVisited[calculatePosIndex(mMazeType, *pos)] = true;
+                    mVisited[posToIndex(mMazeType, *pos)] = true;
 
                     // Push pos onto the stack, and assign posPlusDirection to pos
                     mPath.push_back(std::move(pos));

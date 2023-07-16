@@ -11,17 +11,11 @@ private:
     // Members
     std::shared_ptr<Node> previous_node;
     std::shared_ptr<Vector2> position;
-	int cost;
+    int gCost; // Start to this node
+    int hCost; // This node to the goal
 public:
 	Node(Vector2&);
 	Node(std::shared_ptr<Node>, std::shared_ptr<Vector2>, Vector2&);
-	
-	// Static methods
-	int calculateCost(Vector2 goal)
-	{
-		return getSize() + getPos()->distTo(goal);
-	}
-	int getCost();
 
     // Methods
     std::shared_ptr<Node> getPrev() const;
@@ -29,5 +23,11 @@ public:
     std::shared_ptr<Vector2> getPos() const;
     void setPos(std::shared_ptr<Vector2>);
     int getSize();
+    void calculateCost(Vector2& goal);
+	int getGCost();
+    int getHCost();
+    int getCost();
+    void setGCost(int);
+    void setHCost(int);
 };
 #endif
