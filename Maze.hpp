@@ -9,35 +9,19 @@
 #include "Vector2.hpp"
 #include "SearchAlg.hpp"
 
-// Define the maze macros
-#define E_COLS 20
-#define E_ROWS 10
-#define E_FILENAME "mazes/maze-Easy.txt"
-#define E_NAME "EASY"
-
-#define M_COLS 200
-#define M_ROWS 100
-#define M_FILENAME "mazes/maze-Medium.txt"
-#define M_NAME "MEDIUM"
-
-#define L_COLS 300
-#define L_ROWS 600
-#define L_FILENAME "mazes/maze-Large.txt"
-#define L_NAME "LARGE"
-
-#define V_COLS 2000
-#define V_ROWS 1000
-#define V_FILENAME "mazes/maze-VLarge.txt"
-#define V_NAME "VLARGE"
-
 // Define node macros
 #define EMPTY '-'
 #define WALL '#'
+#define START 's'
+#define GOAL 'g'
+#define VISITED '.'
+#define PATH 'x'
 
 // Function templates
-std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char);
+std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>, int, int> readMaze(std::string filename);
 std::unique_ptr<Vector2> calculatePos(DFSPath&, int);
-int calculatePosIndex(char, Vector2&);
+int posToIndex(char, Vector2&);
+float getIndexDistance(int i1, int i2, int rows, int cols);
 
 int getCols(char);
 int getRows(char);

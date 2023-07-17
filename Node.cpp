@@ -4,14 +4,14 @@ Node::Node(Vector2 &goal)
 {
 	previous_node = nullptr;
 	position = std::make_unique<Vector2>();
-    cost = calculateCost(goal);
+    calculateCost(goal);
 }
 
 Node::Node(std::shared_ptr<Node> prev_node, std::shared_ptr<Vector2> pos, Vector2& goal)
 {
     previous_node = prev_node;
     position = pos;
-	cost = calculateCost(goal);
+	calculateCost(goal);
 }
 
 std::shared_ptr<Node> Node::getPrev() const
@@ -41,7 +41,33 @@ int Node::getSize()
     return getPrev()->getSize() + 1;
 }
 
+void Node::calculateCost(Vector2 &goal)
+{
+    gCost = getSize()-1;
+    hCost = getPos()->distTo(goal);
+}
+
+int Node::getGCost()
+{
+	return gCost;
+}
+
+int Node::getHCost()
+{
+    return hCost;
+}
+
 int Node::getCost()
 {
-	return cost;
+    return gCost + hCost;
+}
+
+void Node::setGCost(int gCost)
+{
+    this->gCost = gCost;
+}
+
+void Node::setHCost(int hCost)
+{
+    this->hCost = hCost;
 }

@@ -16,7 +16,7 @@ std::unique_ptr<Vector2> g_ZERO = std::make_unique<Vector2>(0, 0);
 
 int main(int argc, char **argv)
 {
-	char mazeType = 'E';
+	std::string mazeFileName = "maze-Easy.txt";
 	bool dfs = true;
 	int iterations = 1;
 	bool outputMaze = true;
@@ -24,18 +24,15 @@ int main(int argc, char **argv)
 	{
 		if (argc > 1)
 		{
-			char *argMaze = argv[1];
-			switch (argMaze[0])
-			{
-			case 'E':
-			case 'M':
-			case 'L':
-			case 'V':
-				mazeType = argMaze[0];
-				break;
-			default:
-				throw 1;
-			}
+			mazeFileName = argv[1];
+			if (mazeFileName == "E")
+				mazeFileName = "maze-Easy.txt";
+			else if (mazeFileName == "M")
+				mazeFileName = "maze-Medium.txt";
+			else if (mazeFileName == "L")
+				mazeFileName = "maze-Large.txt";
+			else if (mazeFileName == "VL")
+				mazeFileName = "maze-VLarge.txt";
 		}
 		if (argc > 2)
 		{
@@ -70,9 +67,6 @@ int main(int argc, char **argv)
 	{
 		switch (argI)
 		{
-		case 1:
-			std::cout << "Invalid [MAZE] argument." << std::endl;
-			break;
 		case 2:
 			std::cout << "Invalid [ALG] argument." << std::endl;
 			break;
@@ -93,31 +87,29 @@ int main(int argc, char **argv)
 	high_resolution_clock::time_point before = high_resolution_clock::now();
 
     // Run the search algorithms
-	runSolver(mazeType, dfs, iterations, outputMaze);
+	runSolver(mazeFileName, dfs, iterations, outputMaze);
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);
 	std::cout << "Average time taken for one to execute: " << timeTaken.count() / iterations << "s" << std::endl;
 }
 
-void runSolver(char mazeType, bool dfs, int N, bool outputMaze)
+void runSolver(std::string mazeFileName, bool dfs, int N, bool outputMaze)
 {
 	if (dfs)
 	{
 		for (int i = 0; i < N; i++)
 		{
-			DFS *dfs = new DFS(mazeType, outputMaze);
+			std::unique_ptr<DFS> dfs = std::make_unique<DFS>(mazeFileName, outputMaze);
 			dfs->run();
-			delete dfs;
 		}
 	}
 	else
 	{
 		for (int i = 0; i < N; i++)
 		{
-			AStar *as = new AStar(mazeType, outputMaze);
-			as->run();
-			delete as;
+			std::unique_ptr<AStar> astar = std::make_unique<AStar>(mazeFileName, outputMaze);
+			astar->run();
 		}
 	}
 }
