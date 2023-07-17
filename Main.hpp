@@ -1,1 +1,1 @@
-void runSolver(char, bool, int, bool);
+void runSolver(std::string, bool, int, bool);

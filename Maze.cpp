@@ -7,9 +7,9 @@
 #include "Vector2.hpp"
 
 
-// Convert the maze file into a char array
-// Also provides start and goal vectors
-std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>> readMaze(char mazeType)
+// Convert the maze file into a char vector
+// Also provides start and goal vectors, and number of rows and cols
+std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>, int, int> readMaze(std::string fileName)
 {
     std::vector<char> maze;
     std::shared_ptr<Vector2> start = std::make_shared<Vector2>();
@@ -17,39 +17,48 @@ std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>
 
     // Create input file stream
     std::ifstream fin;
-    fin.open(getFilename(mazeType));
+    fin.open("mazes/" + fileName);
+    std::string line;
 
-    // Iterate over the entire file, putting it into an array
-    for (int i = 0; i < getRows(mazeType); i++)
+    int col = -1;
+    int row = -1;
+
+    // Iterate over every line
+    while (std::getline(fin, line))
     {
-        for (int j = 0; j < getCols(mazeType); j++)
+        col = -1;
+        row++;
+        for (int i = 0; i < line.size(); i++)
         {
-            char c;
-            fin >> c;
-            maze.push_back(c);
-
-            // If we're on the first row, and there is an empty node
-            // Then this must be the start node
-            if (i == 0 && c == EMPTY)
+            char ch = line.at(i);
+            col++;
+            if (ch == START)
             {
-                start->x = j;
-                start->y = i;
+                start->x = col;
+                start->y = row;
             }
-
-            // If we're on the final row, and there is an empty node
-            // Then this must be the goal node
-            else if (i == getRows(mazeType) - 1 && c == EMPTY)
+            else if (ch == GOAL)
             {
-                goal->x = j;
-                goal->y = i;
+                goal->x = col;
+                goal->y = row;
             }
+            else if (ch != EMPTY && ch != WALL)
+            {
+                // Skip pushing this character - it is invalid.
+                col--;
+                continue;
+            }
+            maze.push_back(ch);
         }
     }
 
     // Close the file
     fin.close();
 
-    return std::make_tuple(maze, start, goal);
+    // Assume the user has given rectangular input
+    int rows = row + 1;
+    int cols = col + 1;
+    return std::make_tuple(maze, start, goal, rows, cols);
 }
 
 
@@ -63,72 +72,9 @@ std::unique_ptr<Vector2> calculatePos(DFSPath& path, int index)
 }
 
 
-// Convert vector to index of maze array
-int posToIndex(char mazeType, Vector2& pos)
-{
-    return (pos.y) * getCols(mazeType) + pos.x;
-}
-
-
 float getIndexDistance(int i1, int i2, int cols)
 {
     int dx = (i1 - i2) % cols;
     int dy = (i1 - i2) / cols;
     return abs(dx) + abs(dy);
-}
-
-
-int getRows(char type)
-{
-	if (type == 'E')
-		return E_ROWS;
-	if (type == 'M')
-		return M_ROWS;
-	if (type == 'L')
-		return L_ROWS;
-	if (type == 'V')
-		return V_ROWS;
-	return -1;
-}
-
-
-int getCols(char type)
-{
-	if (type == 'E')
-		return E_COLS;
-	if (type == 'M')
-		return M_COLS;
-	if (type == 'L')
-		return L_COLS;
-	if (type == 'V')
-		return V_COLS;
-	return -1;
-}
-
-
-std::string getFilename(char type)
-{
-	if (type == 'E')
-		return E_FILENAME;
-	if (type == 'M')
-		return M_FILENAME;
-	if (type == 'L')
-		return L_FILENAME;
-	if (type == 'V')
-		return V_FILENAME;
-	return "";
-}
-
-
-std::string getName(char type)
-{
-	if (type == 'E')
-		return E_NAME;
-	if (type == 'M')
-		return M_NAME;
-	if (type == 'L')
-		return L_NAME;
-	if (type == 'V')
-		return V_NAME;
-	return "";
 }

@@ -1,8 +1,7 @@
 #include <vector>
 #include <stack>
 #include <tuple>
-
-#include <vector>
+#include <string>
 
 #include "SearchAlg.hpp"
 #include "Vector2.hpp"
@@ -14,7 +13,7 @@ private:
     std::vector<bool> mVisited;
     DFSPath mPath;
 public:
-    DFS(char, bool);
+    DFS(std::string, bool);
     void run() override;
     void dfs();
     void outputPathToFile() override;

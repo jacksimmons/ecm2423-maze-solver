@@ -10,11 +10,9 @@
 #include "Constants.hpp"
 
 
-AStar::AStar(char mazeType, bool bOutputMazeToFile) : SearchAlg(mazeType, bOutputMazeToFile)
+AStar::AStar(std::string filename, bool bOutputMazeToFile) : SearchAlg(filename, bOutputMazeToFile)
 {
     mNumNodes = 0;
-    mCols = getCols(mMazeType);
-    mRows = getRows(mMazeType);
 }
 
 void AStar::run()
@@ -29,8 +27,8 @@ void AStar::run()
     this->astar();
 
     // Print each position in (x,y) format
-    int iStart = posToIndex(mMazeType, *mStart);
-    int iGoal = posToIndex(mMazeType, *mGoal);
+    int iStart = posToIndex(*mStart);
+    int iGoal = posToIndex(*mGoal);
     int index = iGoal;
 
     // Termination condition is executed after the step counter and output, so that iStart is included.
@@ -57,8 +55,8 @@ void AStar::run()
 
 void AStar::astar()
 {
-    int iStart = posToIndex(mMazeType, *mStart);
-    int iGoal = posToIndex(mMazeType, *mGoal);
+    int iStart = posToIndex(*mStart);
+    int iGoal = posToIndex(*mGoal);
 
     // Initial setup for the open list
     mOpenList.push_front(iStart);
@@ -103,13 +101,13 @@ void AStar::astar()
 
 		std::vector<int> validNeighbours;
 
-        if ((iUp > 0) && (mMaze[iUp] == EMPTY))
+        if ((iUp > 0) && (mMaze[iUp] != WALL))
             validNeighbours.push_back(iUp);
-        if ((iDown < mRows * mCols) && (mMaze[iDown] == EMPTY))
+        if ((iDown < mRows * mCols) && (mMaze[iDown] != WALL))
             validNeighbours.push_back(iDown);
-        if ((iLeft > 0) && (iLeft % mCols != 0) && (mMaze[iLeft] == EMPTY))
+        if ((iLeft > 0) && (iLeft % mCols != 0) && (mMaze[iLeft] != WALL))
             validNeighbours.push_back(iLeft);
-        if ((iRight % mCols) != (mCols - 1) && (mMaze[iRight] == EMPTY))
+        if ((iRight % mCols) != (mCols - 1) && iRight < mRows * mCols && (mMaze[iRight] != WALL))
             validNeighbours.push_back(iRight);
 
         // Remove node at the front and put its position in the explored list
@@ -185,7 +183,7 @@ void AStar::outputPathToFile()
     std::string fileName = "PathOutput.txt";
     std::ofstream file;
     file.open(fileName);
-    file << "--- A* SEARCH " << getName(mMazeType) << "[" << getFilename(mMazeType) << "]" << std::endl;
+    file << "--- A* SEARCH " << "[" << mFileName << "]" << std::endl;
 
     for (int i = 0; i < mPath.size(); i++)
     {
@@ -201,26 +199,24 @@ void AStar::outputMazeToFile()
     file.open(fileName);
 
     // Iterate over every character in the maze array
-    for (int i = 0; i < getRows(mMazeType); i++)
+    for (int i = 0; i < mRows; i++)
     {
-        for (int j = 0; j < getCols(mMazeType); j++)
+        for (int j = 0; j < mCols; j++)
         {
-            int index = i * getCols(mMazeType) + j;
+            int index = i * mCols + j;
 
-            // Empty by default
-            char c = EMPTY;
-            if (mMaze[index] == WALL)
-                c = WALL;
-            else
+            // Default is the original maze value
+            char c = mMaze[index];
+            if (c == EMPTY)
             {
                 if (mClosedList.at(index) != -1)
                 {
-                    c = '.';
+                    c = VISITED;
                 }
 
                 if (std::find(mPath.begin(), mPath.end(), index) != mPath.end())
                 {
-                    c = 'x';
+                    c = PATH;
                 }
             }
             // Output the character c to file
@@ -231,46 +227,4 @@ void AStar::outputMazeToFile()
     }
 
     file.close();
-}
-
-
-bool isNodeParentOf(std::shared_ptr<Node> potential_parent, std::shared_ptr<Node> potential_child)
-{
-    // Iterate through every node in node_ptr->getPrev()->...->0
-    // Check if node_ptr points to the child
-    // If not, continue iterating until the address 0x0 is reached
-    // If 0x0 is reached, potential_parent is not a parent of potential_child.
-    while (potential_parent != nullptr)
-    {
-        if (potential_parent == potential_child)
-            return true;
-        potential_parent = potential_parent->getPrev();
-    }
-    return false;
-}
-
-bool hasNodeExplored(std::shared_ptr<Node> node, Vector2& pos)
-{
-    // Iterate through every node in node_ptr->getPrev()->...->nullptr
-    // Check if *node_ptr->getPos() == *pos
-    // If not, continue iterating until the address 0x0 is reached
-    // If 0x0 is reached, the position has not been explored by this node
-    // Casting is necessary as getPrev is an inherited method from Node, returning Node*.
-    while (node != nullptr)
-    {
-        if (*node->getPos() == pos)
-            return true;
-        node = node->getPrev();
-    }
-    return false;
-}
-
-bool isPosInOpenList(Vector2& pos, std::deque<std::shared_ptr<Node>>& nodes)
-{
-    for (int i = 0; i < nodes.size(); i++)
-    {
-        if (*nodes.at(i)->getPos() == pos)
-            return true;
-    }
-    return false;
 }
