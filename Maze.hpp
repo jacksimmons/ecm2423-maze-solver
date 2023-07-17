@@ -21,7 +21,7 @@
 std::tuple<std::vector<char>, std::shared_ptr<Vector2>, std::shared_ptr<Vector2>, int, int> readMaze(std::string filename);
 std::unique_ptr<Vector2> calculatePos(DFSPath&, int);
 int posToIndex(char, Vector2&);
-float getIndexDistance(int i1, int i2, int cols);
+float getIndexDistance(int i1, int i2, int rows, int cols);
 
 int getCols(char);
 int getRows(char);

@@ -47,6 +47,7 @@ The program optionally outputs to MazeOutput.txt, where the input maze is copied
 maze followed, as well as other visited nodes, are overlayed on top of it.
 MazeOutput.txt output is disabled by default, since it is slow for large mazes.
 
+
 Compiling and running:
 1. g++ *.cpp -o [executable-name]
 2. ./[executable-name] [MAZE_FILE: string] [ALGOITHM: string] [ITERATIONS: uint] [OUTPUT_MAZE: bool]
@@ -55,6 +56,12 @@ No arguments leads to the default process (maze-Easy.txt, DFS, 1, false).
 
 [MAZE_FILE] default: "maze-Easy.txt"
     The name of any maze file under the mazes folder, that you want solved.
+    Additionally, the following phrases can be used as shortcuts for the 4 default mazes:
+    "E" - maze-Easy.txt
+    "M" - maze-Medium.txt
+    "L" - maze-Large.txt
+    "VL" - maze-VLarge.txt
+
 
 [ALGORITHM] default: "dfs"
     The search algorithm to use, as one lowercase word; "astar" or "dfs".

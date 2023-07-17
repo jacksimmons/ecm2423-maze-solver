@@ -72,9 +72,9 @@ std::unique_ptr<Vector2> calculatePos(DFSPath& path, int index)
 }
 
 
-float getIndexDistance(int i1, int i2, int cols)
+float getIndexDistance(int i1, int i2, int rows, int cols)
 {
     int dx = (i1 - i2) % cols;
-    int dy = (i1 - i2) / cols;
+    int dy = (i1 - i2) / rows;
     return abs(dx) + abs(dy);
 }

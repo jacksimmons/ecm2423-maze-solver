@@ -123,14 +123,14 @@ void AStar::astar()
             int iNeighbour = validNeighbours.at(i);
             
             // Distance from start to neighbour via current
-            int tentativeGCost = mGCosts[current] + getIndexDistance(current, iNeighbour, mCols);
+            int tentativeGCost = mGCosts[current] + getIndexDistance(current, iNeighbour, mRows, mCols);
 
             if (tentativeGCost < mGCosts[iNeighbour])
             {
                 mClosedList[iNeighbour] = current;
 
                 mGCosts[iNeighbour] = tentativeGCost;
-                mFCosts[iNeighbour] = tentativeGCost + getIndexDistance(iNeighbour, iGoal, mCols);
+                mFCosts[iNeighbour] = tentativeGCost + getIndexDistance(iNeighbour, iGoal, mRows, mCols);
 
                 if (std::count(mOpenList.begin(), mOpenList.end(), iNeighbour) == 0)
                 {

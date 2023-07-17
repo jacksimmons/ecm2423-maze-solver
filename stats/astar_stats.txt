@@ -20,8 +20,8 @@ Large - 7.04s / 41900
 VLarge - 296s / 273931
 
 v1.04 - stopped using Vector2 and Node - nearly 50x improvement on VLarge
-Easy - 578us / 35 / 27
-Medium - 9.19ms / 2009 / 321
-Large - 291ms / 67073 / 1092 (?)
-VLarge - 6.46s / 863014 / 3691
+Easy - 578us / 34 / 27
+Medium - 9.19ms / 2298 / 321
+Large - 291ms / 65524 / 974
+VLarge - 6.46s / 711180 / 3691
 Optimised VLarge - 0.943s

@@ -25,6 +25,14 @@ int main(int argc, char **argv)
 		if (argc > 1)
 		{
 			mazeFileName = argv[1];
+			if (mazeFileName == "E")
+				mazeFileName = "maze-Easy.txt";
+			else if (mazeFileName == "M")
+				mazeFileName = "maze-Medium.txt";
+			else if (mazeFileName == "L")
+				mazeFileName = "maze-Large.txt";
+			else if (mazeFileName == "VL")
+				mazeFileName = "maze-VLarge.txt";
 		}
 		if (argc > 2)
 		{
