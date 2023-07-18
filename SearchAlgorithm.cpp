@@ -231,9 +231,7 @@ InformedSearch::InformedSearch(std::string fileName, bool c_out, bool p_out, boo
 
 
 // Get the distance between two positions.
-// Note that y must be calculated by comparing the y values, as y can increase with just
-// 1 increment. (It can't be calculated the same way as x)
 int InformedSearch::getPosDist(int i1, int i2)
 {
-    return abs(getPosX(i1 - i2)) + abs(getPosY(i1) - getPosY(i2));
+    return abs(getPosX(i1) - getPosX(i2)) + abs(getPosY(i1) - getPosY(i2));
 }

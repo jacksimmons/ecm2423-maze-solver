@@ -35,9 +35,6 @@ void AStar::run()
     // Loop the algorithm until the list is empty (invalid maze), or the algorithm terminates
     while (!mOpenList.empty())
     {
-        // std::cin.get();
-        // outputCostsToFile();
-
         // Get current node
         int current = mOpenList.front();
 

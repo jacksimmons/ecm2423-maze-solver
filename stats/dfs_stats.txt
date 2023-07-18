@@ -19,4 +19,3 @@ Medium - 3.80ms / 4776 / 449
 Large - 15.5ms / 22372 / 1120
 VLarge - 142ms / 464328 / 3745 (>5x improvement)
 Optimised VLarge - 56ms
-Optimised + No File Output Easy - 104us (Bit silly)
