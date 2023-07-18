@@ -1,3 +1,6 @@
+Format:
+Size - Time / Nodes visited / Nodes in final path
+
 [14/7] v1.01 / v1.02 classes
 Easy - 523us / 77 / 29
 Medium - 20.9ms / 4782 / 449
@@ -7,5 +10,12 @@ VLarge - 12.0s
 v1.03 - smart pointers
 Easy - 786us / 76 / 27
 Medium - 12.2ms / 4871 / 449
-Large - 55.0ms / 22371 / 1120
-VLarge - 850ms / 468365 / 3745 (10x improvement!)
+Large - 55.0ms / 22371 / 1121
+VLarge - 850ms / 468365 / 3745 (>10x improvement)
+
+v1.05 - Removed Vector2 usage
+Easy - 477us / 76 / 27
+Medium - 3.80ms / 4776 / 449
+Large - 15.5ms / 22372 / 1120
+VLarge - 142ms / 464328 / 3745 (>5x improvement)
+Optimised VLarge - 56ms

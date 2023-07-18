@@ -1,21 +1,10 @@
-#include <vector>
-#include <stack>
-#include <tuple>
 #include <string>
 
-#include "SearchAlg.hpp"
-#include "Vector2.hpp"
-#include "Maze.hpp"
+#include "SearchAlgorithm.hpp"
 
-class DFS : public SearchAlg
+class DFS : public Search
 {
-private:
-    std::vector<bool> mVisited;
-    DFSPath mPath;
 public:
-    DFS(std::string, bool);
+    DFS(std::string, bool, bool, bool);
     void run() override;
-    void dfs();
-    void outputPathToFile() override;
-    void outputMazeToFile() override;
 };

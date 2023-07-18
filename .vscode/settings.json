@@ -82,6 +82,7 @@
         "map": "cpp",
         "xhash": "cpp",
         "xtree": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "climits": "cpp"
     }
 }

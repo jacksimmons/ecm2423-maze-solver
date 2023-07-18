@@ -1,114 +1,70 @@
-#include <algorithm>
 #include <queue>
+#include <iostream>
+#include <iomanip>
 #include <fstream>
-#include <unordered_map>
 
 #include <climits>
 #include <cmath>
 
 #include "AStar.hpp"
-#include "Constants.hpp"
 
 
-AStar::AStar(std::string filename, bool bOutputMazeToFile) : SearchAlg(filename, bOutputMazeToFile)
+AStar::AStar(std::string filename, bool c_out, bool p_out, bool m_out)
+ : InformedSearch(filename, c_out, p_out, m_out)
 {
-    mNumNodes = 0;
-}
+    // Logging
+    mSearchName = "A*";
 
-void AStar::run()
-{
-    // Output the start and end of the maze
-    std::cout << "Start: " << std::endl;
-    Vector2::print(*mStart);
-    std::cout << "Goal: " << std::endl;
-    Vector2::print(*mGoal);
-
-    // Complete the search
-    this->astar();
-
-    // Print each position in (x,y) format
-    int iStart = posToIndex(*mStart);
-    int iGoal = posToIndex(*mGoal);
-    int index = iGoal;
-
-    // Termination condition is executed after the step counter and output, so that iStart is included.
-    // iStart points to a non -1 node, as mPath simply stores the shortest path to it.
-    while (true)
-    {
-        mPath.push_front(index);
-
-        if (index == iStart)
-            break;
-
-        index = mClosedList.at(index);
-    }
-
-    // Output the path and maze to files
-    outputPathToFile();
-    if (mOutputMazeToFile)
-        outputMazeToFile();
-
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << mNumNodes << std::endl;
-    std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
-}
-
-void AStar::astar()
-{
-    int iStart = posToIndex(*mStart);
-    int iGoal = posToIndex(*mGoal);
-
-    // Initial setup for the open list
-    mOpenList.push_front(iStart);
-
-    int current;
-
+    // Initial setup
     for (int i = 0; i < mRows * mCols; i++)
     {
         mGCosts.push_back(INT_MAX);
         mFCosts.push_back(INT_MAX);
-        mClosedList.push_back(-1);
+        mVisited.push_back(-1);
     }
 
-    mGCosts[iStart] = 0;
+    mOpenList.push_front(mStart);
+    mGCosts[mStart] = 1;
 
+    setup();
+}
+
+
+void AStar::run()
+{
     // Loop the algorithm until the list is empty (invalid maze), or the algorithm terminates
     while (!mOpenList.empty())
-    {        
+    {
         // Get current node
-        current = mOpenList.front();
+        int current = mOpenList.front();
 
         // Check if the position is the goal early to save one pass
         // If this is the case, the goal has been reached and a path found
         // Terminate the loop
-        if (current == iGoal)
+        if (current == mGoal)
         {
             break;
         }
 
-        // Increment the numNodes counter
-        // Since every loop is an atomic action - an exploration of a node.
-        mNumNodes++;
-
         // Create position vectors for all cardinal directions
-        int iUp = current - mCols;
-        int iDown = current + mCols;
-        int iLeft = current - 1;
-        int iRight = current + 1;
+        int up = getPosPlusDir(current, 0, -1);
+        int down = getPosPlusDir(current, 0, 1);
+        int left = getPosPlusDir(current, -1, 0);
+        int right = getPosPlusDir(current, 1, 0);
 
         // Calculate whether or not each cardinal direction should be traversed
         // Uses node as a test case by setting its position to said cardinal direction
 
 		std::vector<int> validNeighbours;
 
-        if ((iUp > 0) && (mMaze[iUp] != WALL))
-            validNeighbours.push_back(iUp);
-        if ((iDown < mRows * mCols) && (mMaze[iDown] != WALL))
-            validNeighbours.push_back(iDown);
-        if ((iLeft > 0) && (iLeft % mCols != 0) && (mMaze[iLeft] != WALL))
-            validNeighbours.push_back(iLeft);
-        if ((iRight % mCols) != (mCols - 1) && iRight < mRows * mCols && (mMaze[iRight] != WALL))
-            validNeighbours.push_back(iRight);
+        if ((up > 0) && (mMaze[up] != WALL))
+            validNeighbours.push_back(up);
+        if ((down < mRows * mCols) && (mMaze[down] != WALL))
+            validNeighbours.push_back(down);
+        if ((left % mCols != 0) && left > 0 && (mMaze[left] != WALL))
+            validNeighbours.push_back(left);
+        if ((right % mCols) != (mCols - 1) && right < mRows * mCols && (mMaze[right] != WALL))
+            validNeighbours.push_back(right);
 
         // Remove node at the front and put its position in the explored list
         // Placed after goal checking, so that node doesn't get deleted on the final step
@@ -120,28 +76,46 @@ void AStar::astar()
 
 		for (int i = 0; i < validNeighbours.size(); i++)
 		{
-            int iNeighbour = validNeighbours.at(i);
+            int neighbour = validNeighbours.at(i);
             
             // Distance from start to neighbour via current
-            int tentativeGCost = mGCosts[current] + getIndexDistance(current, iNeighbour, mRows, mCols);
+            int tentativeGCost = mGCosts[current] + getPosDist(current, neighbour);
 
-            if (tentativeGCost < mGCosts[iNeighbour])
+            if (tentativeGCost < mGCosts[neighbour])
             {
-                mClosedList[iNeighbour] = current;
+                mVisited[neighbour] = current;
 
-                mGCosts[iNeighbour] = tentativeGCost;
-                mFCosts[iNeighbour] = tentativeGCost + getIndexDistance(iNeighbour, iGoal, mRows, mCols);
+                mGCosts[neighbour] = tentativeGCost;
+                mFCosts[neighbour] = tentativeGCost + getPosDist(neighbour, mGoal);
 
-                if (std::count(mOpenList.begin(), mOpenList.end(), iNeighbour) == 0)
+                if (std::count(mOpenList.begin(), mOpenList.end(), neighbour) == 0)
                 {
-                    insertIndexIntoOpenList(iNeighbour);
+                    insertIndexIntoOpenList(neighbour);
                 }
             }
 		}
     }
     
     mOpenList.clear();
+
+    // Need to reverse the list for printing
+    int pos = mGoal;
+
+    // Termination condition is executed after the step counter and output, so that mStart is included.
+    // mStart points to a non -1 node, as mPath simply stores the shortest path to it.
+    while (true)
+    {
+        mPath.push_front(pos);
+
+        if (pos == -1)
+            mPath.clear();
+        if (pos == mStart || pos == -1)
+            break;
+
+        pos = mVisited.at(pos);
+    }
 }
+
 
 // (Inplace) Performs one pass of insertion sort to place the front element into its
 // correct position in the list.
@@ -177,54 +151,31 @@ void AStar::insertIndexIntoOpenList(int index)
     return;
 }
 
-// Output the path to PathOutput.txt
-void AStar::outputPathToFile()
-{
-    std::string fileName = "PathOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
-    file << "--- A* SEARCH " << "[" << mFileName << "]" << std::endl;
 
-    for (int i = 0; i < mPath.size(); i++)
-    {
-        file << "(" << mPath[i] % mCols << ", " << mPath[i] / mCols << ")" << std::endl;
-    }
-    file.close();
-}
+// void AStar::outputCostsToFile()
+// {
+//     std::string fileName = "CostOutput.txt";
+//     std::ofstream file;
+//     file.open(fileName);
 
-void AStar::outputMazeToFile()
-{
-    std::string fileName = "MazeOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
-
-    // Iterate over every character in the maze array
-    for (int i = 0; i < mRows; i++)
-    {
-        for (int j = 0; j < mCols; j++)
-        {
-            int index = i * mCols + j;
-
-            // Default is the original maze value
-            char c = mMaze[index];
-            if (c == EMPTY)
-            {
-                if (mClosedList.at(index) != -1)
-                {
-                    c = VISITED;
-                }
-
-                if (std::find(mPath.begin(), mPath.end(), index) != mPath.end())
-                {
-                    c = PATH;
-                }
-            }
-            // Output the character c to file
-            file << c;
-        }
-        // Newline for next row
-        file << std::endl;
-    }
-
-    file.close();
-}
+//     int size = mRows * mCols;
+//     int digits = 0;
+//     while (size != 0)
+//     {
+//         size /= 10;
+//         digits++;
+//     }
+    
+//     std::cout << "[ ";
+//     for (int i = 0; i < mRows * mCols; i++)
+//     {
+//         int cost = mGCosts[i];
+//         if (cost == INT_MAX)
+//             cost = -1;
+//         std::cout << std::setw(digits) << std::to_string(cost) << " ";
+//         if (i % mCols == mCols - 1)
+//             std::cout << "]" << std::endl << "[ ";
+//     }
+//     std::cout << "]" << std::endl;
+//     file.close();
+// }
