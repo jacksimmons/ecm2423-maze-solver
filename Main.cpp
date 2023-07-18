@@ -1,3 +1,4 @@
+#include <iostream>
 #include <chrono>
 #include <stdexcept>
 #include <string>
@@ -5,14 +6,7 @@
 #include "Main.hpp"
 #include "AStar.hpp"
 #include "DFS.hpp"
-#include "Constants.hpp"
 
-// Assign to the externs in Constants.h
-std::unique_ptr<Vector2> g_UP = std::make_unique<Vector2>(0, -1);
-std::unique_ptr<Vector2> g_DOWN = std::make_unique<Vector2>(0, 1);
-std::unique_ptr<Vector2> g_LEFT = std::make_unique<Vector2>(-1, 0);
-std::unique_ptr<Vector2> g_RIGHT = std::make_unique<Vector2>(1, 0);
-std::unique_ptr<Vector2> g_ZERO = std::make_unique<Vector2>(0, 0);
 
 int main(int argc, char **argv)
 {
@@ -100,16 +94,18 @@ void runSolver(std::string mazeFileName, bool dfs, int N, bool outputMaze)
 	{
 		for (int i = 0; i < N; i++)
 		{
-			std::unique_ptr<DFS> dfs = std::make_unique<DFS>(mazeFileName, outputMaze);
+			DFS *dfs = new DFS(mazeFileName, outputMaze);
 			dfs->run();
+			delete dfs;
 		}
 	}
 	else
 	{
 		for (int i = 0; i < N; i++)
 		{
-			std::unique_ptr<AStar> astar = std::make_unique<AStar>(mazeFileName, outputMaze);
+			AStar *astar = new AStar(mazeFileName, outputMaze);
 			astar->run();
+			delete astar;
 		}
 	}
 }

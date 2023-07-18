@@ -1,22 +1,25 @@
 #ifndef SEARCHALG_H
 #define SEARCHALG_H 1
 
+#include <algorithm>
 #include <string>
 #include <memory>
 #include <vector>
 #include <deque>
 
-#include "Vector2.hpp"
-
-typedef std::deque<std::shared_ptr<Vector2>> DFSPath;
-typedef std::vector<std::shared_ptr<Vector2>> AStarPath;
 
 class SearchAlg {
 protected:
     std::string mFileName;
+    std::string mSearchName;
+
     std::vector<char> mMaze;
-    std::shared_ptr<Vector2> mStart;
-    std::shared_ptr<Vector2> mGoal;
+    std::deque<int> mPath;
+    std::vector<int> mVisited;
+
+    int mStart;
+    int mGoal;
+
     bool mOutputMazeToFile;
 
     int mRows;
@@ -24,9 +27,21 @@ protected:
 public:
     SearchAlg(std::string filename, bool outputMaze);
     virtual void run() = 0;
-    virtual void outputPathToFile() = 0;
-    virtual void outputMazeToFile() = 0;
 
-    int posToIndex(Vector2& pos);
+    void loadMaze();
+
+    int cartesianToPos(int posx, int posy);
+
+    int getPosX(int pos);
+    int getPosY(int pos);
+
+    int getPosDist(int pos1, int pos2);
+    int getPosPlusDir(int pos, int dirX, int dirY);
+
+    std::string posToStr(int pos);
+    void outputPathToFile();
+    void outputMazeToFile();
+
+    int calculateNumNodesVisited();
 };
 #endif

@@ -5,22 +5,16 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Vector2.hpp"
-#include "Node.hpp"
 #include "SearchAlg.hpp"
 #include "Maze.hpp"
 
+
 class AStar : public SearchAlg {
-private:
-    int mNumNodes;
-    
+private:    
     std::deque<int> mOpenList;
-    std::vector<int> mClosedList;
-    std::deque<int> mPath;
 
-    std::vector<float> mGCosts;
-    std::vector<float> mFCosts;
-
+    std::vector<int> mGCosts;
+    std::vector<int> mFCosts;
 public:
 
     AStar(std::string, bool);
@@ -30,6 +24,5 @@ public:
     // Carries out one pass of an insertion sort, so that the open list acts a priority queue.
     void insertIndexIntoOpenList(int index);
 
-    void outputPathToFile() override;
-    void outputMazeToFile() override;
+    void outputCostsToFile();
 };
