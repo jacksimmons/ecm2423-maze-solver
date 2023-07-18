@@ -4,9 +4,11 @@
 #include <stack>
 
 #include "DFS.hpp"
+#include "Maze.hpp"
 
 
-DFS::DFS(std::string fileName, bool outputMaze) : SearchAlg(fileName, outputMaze)
+DFS::DFS(std::string fileName, bool c_out, bool p_out, bool m_out)
+ : Search(fileName, c_out, p_out, m_out)
 {
     mSearchName = "DFS";
 
@@ -15,37 +17,15 @@ DFS::DFS(std::string fileName, bool outputMaze) : SearchAlg(fileName, outputMaze
         mVisited.push_back(-1);
     }
 
-    // Mark starting node as visited as we start here (visited is != -1, see SearchAlg.cpp)
+    // Mark starting node as visited as we start here (visited is != -1, see InformedSearch.cpp)
     mVisited[mStart] = 0;
     mPath.push_back(mStart);
+
+    setup();
 }
+
 
 void DFS::run()
-{
-    // Complete the search
-    dfs();
-
-    // Failure
-    if (mPath.size() == 0)
-    {
-        std::cout << "Failed to find a solution." << std::endl;
-        return;
-    }
-
-    // Remove the duplicate start element
-    mPath.pop_front();
-
-    // File output
-	outputPathToFile();
-    if (mOutputMazeToFile)
-        outputMazeToFile();
-    
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << calculateNumNodesVisited() << std::endl;
-    std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
-}
-
-void DFS::dfs()
 {
     // Initialise direction and pos
     int dirX = 0;
@@ -57,7 +37,6 @@ void DFS::dfs()
         // Check if we have reached the goal
         if (current == mGoal)
         {
-            std::cout << "Found the goal!" << std::endl;
             mPath.push_back(current);
             break;
         }
@@ -137,4 +116,7 @@ void DFS::dfs()
             }
         }
     }
+
+    // Remove the duplicate start element
+    mPath.pop_front();
 }

@@ -5,7 +5,7 @@ Must have (optimality):
 Easy - 27 steps
 Medium - 321 steps
 Large - 974 steps
-VLarge - 3691 steps (assumed correct)
+VLarge - 3691 steps
 
 [14/7] v1.01 / v1.02 classes
 Easy - 550us / 36 / 27
@@ -21,7 +21,7 @@ VLarge - 296s / 273931
 
 v1.04 - stopped using Vector2 and Node
 Easy - 578us / 34 / 27
-Medium - 9.19ms / 2298 / 321
-Large - 291ms / 65524 / 974
-VLarge - 6.46s / 711180 / 3691 (>45x improvement)
+Medium - 9.19ms / 2087 / 321
+Large - 291ms / 67300 / 974
+VLarge - 6.46s / 863249 / 3691 (>45x improvement)
 Optimised VLarge - 0.943s

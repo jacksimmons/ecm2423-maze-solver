@@ -2,16 +2,18 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "SearchAlg.hpp"
+#include "SearchAlgorithm.hpp"
 #include "Maze.hpp"
 
 
-SearchAlg::SearchAlg(std::string filename, bool bOutputMazeToFile)
+Search::Search(std::string filename, bool consoleOutput, bool pathOutput, bool mazeOutput)
 {
     mStart = -1;
     mGoal = -1;
     mFileName = filename;
-    mOutputMazeToFile = bOutputMazeToFile;
+    mOutputConsole = consoleOutput;
+    mOutputPath = pathOutput;
+    mOutputMaze = mazeOutput;
     loadMaze();
 
     if (mStart == -1)
@@ -20,13 +22,43 @@ SearchAlg::SearchAlg(std::string filename, bool bOutputMazeToFile)
         throw std::runtime_error((std::string)"No goal node [" + GOAL + "] was found.");
 
     // Output start and goal positions
-    std::cout << "Start: " << posToStr(mStart) << std::endl;
-    std::cout << "Goal: " << posToStr(mGoal) << std::endl;
+    if (mOutputConsole)
+    {
+        std::cout << "Start: " << posToStr(mStart) << std::endl;
+        std::cout << "Goal: " << posToStr(mGoal) << std::endl;
+    }
+}
+
+
+void Search::setup()
+{
+    // Complete the search
+    run();
+
+    // Failure
+    if (mPath.size() == 0)
+    {
+        std::cout << "Failed to find a solution." << std::endl;
+        return;
+    }
+
+    // File output
+    if (mOutputPath)
+	    outputPathToFile();
+    if (mOutputMaze)
+        outputMazeToFile();
+    
+    // Execution statistics
+    if (mOutputConsole)
+    {
+        std::cout << "Number of nodes visited: " << calculateNumNodesVisited() << std::endl;
+        std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
+    }
 }
 
 
 // Extracts data from the maze file into corresponding data structures.
-void SearchAlg::loadMaze()
+void Search::loadMaze()
 {
     // Create input file stream
     std::ifstream fin;
@@ -83,35 +115,28 @@ void SearchAlg::loadMaze()
 
 
 // Get the col component of a position.
-int SearchAlg::getPosX(int pos)
+int Search::getPosX(int pos)
 {
     return pos % mCols;
 }
 
 
 // Get the row component of a position.
-int SearchAlg::getPosY(int pos)
+int Search::getPosY(int pos)
 {
     return pos / mCols;
 }
 
 
-// Get the distance between two positions.
-int SearchAlg::getPosDist(int i1, int i2)
-{
-    return abs(getPosX(i1 - i2)) + abs(getPosY(i1 - i2));
-}
-
-
 // Convert two coordinates to a position in the maze list.
-int SearchAlg::cartesianToPos(int posx, int posy)
+int Search::cartesianToPos(int posx, int posy)
 {
     return (posy) * mCols + posx;
 }
 
 
 // Convert a position in the maze list to a string coordinate.
-std::string SearchAlg::posToStr(int pos)
+std::string Search::posToStr(int pos)
 {
     std::string x, y;
     x = std::to_string(getPosX(pos));
@@ -122,14 +147,14 @@ std::string SearchAlg::posToStr(int pos)
 
 
 // Returns the position moved in a given direction (dirX and dirY should be -1, 0 or 1).
-int SearchAlg::getPosPlusDir(int pos, int dirX, int dirY)
+int Search::getPosPlusDir(int pos, int dirX, int dirY)
 {
     return pos + dirX + (mCols * dirY);
 }
 
 
 // Output the path to PathOutput.txt.
-void SearchAlg::outputPathToFile()
+void Search::outputPathToFile()
 {
     std::string fileName = "PathOutput.txt";
     std::ofstream file;
@@ -145,7 +170,7 @@ void SearchAlg::outputPathToFile()
 
 
 // Output the maze with the found path and visited nodes on it to MazeOutput.txt.
-void SearchAlg::outputMazeToFile()
+void Search::outputMazeToFile()
 {
     std::string fileName = "MazeOutput.txt";
     std::ofstream file;
@@ -184,7 +209,7 @@ void SearchAlg::outputMazeToFile()
 
 
 // Calculate the number of visited nodes
-int SearchAlg::calculateNumNodesVisited()
+int Search::calculateNumNodesVisited()
 {
 	int numNodes = 0;
 	for (int i = 0; i < mRows * mCols; i++)
@@ -195,4 +220,20 @@ int SearchAlg::calculateNumNodesVisited()
 		}
 	}
     return numNodes;
+}
+
+
+InformedSearch::InformedSearch(std::string fileName, bool c_out, bool p_out, bool m_out)
+ : Search(fileName, c_out, p_out, m_out)
+{
+
+}
+
+
+// Get the distance between two positions.
+// Note that y must be calculated by comparing the y values, as y can increase with just
+// 1 increment. (It can't be calculated the same way as x)
+int InformedSearch::getPosDist(int i1, int i2)
+{
+    return abs(getPosX(i1 - i2)) + abs(getPosY(i1) - getPosY(i2));
 }

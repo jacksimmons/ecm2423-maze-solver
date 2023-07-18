@@ -1,19 +1,22 @@
 #include <iostream>
 #include <chrono>
 #include <stdexcept>
-#include <string>
+#include <memory>
 
 #include "Main.hpp"
-#include "AStar.hpp"
 #include "DFS.hpp"
+#include "BFS.hpp"
+#include "AStar.hpp"
 
 
 int main(int argc, char **argv)
 {
 	std::string mazeFileName = "maze-Easy.txt";
-	bool dfs = true;
+	SearchType searchType = SEARCHTYPE_DFS;
 	int iterations = 1;
-	bool outputMaze = true;
+	bool mazeOutput = true;
+	bool pathOutput = true;
+	bool consoleOutput = true;
 	try
 	{
 		if (argc > 1)
@@ -32,9 +35,11 @@ int main(int argc, char **argv)
 		{
 			std::string argAlg = argv[2];
 			if (argAlg == "dfs")
-				dfs = true;
+				searchType = SEARCHTYPE_DFS;
+			else if (argAlg == "bfs")
+				searchType = SEARCHTYPE_BFS;
 			else if (argAlg == "astar")
-				dfs = false;
+				searchType = SEARCHTYPE_ASTAR;
 			else
 				throw 2;
 		}
@@ -48,13 +53,33 @@ int main(int argc, char **argv)
 		}
 		if (argc > 4)
 		{
-			std::string argOutputMaze = argv[4];
-			if (argOutputMaze == "true")
-				outputMaze = true;
-			else if (argOutputMaze == "false")
-				outputMaze = false;
+			std::string argMazeOutput = argv[4];
+			if (argMazeOutput == "true")
+				mazeOutput = true;
+			else if (argMazeOutput == "false")
+				mazeOutput = false;
 			else
 				throw 4;
+		}
+		if (argc > 5)
+		{
+			std::string argPathOutput = argv[5];
+			if (argPathOutput == "true")
+				pathOutput = true;
+			else if (argPathOutput == "false")
+				pathOutput = false;
+			else
+				throw 5;
+		}
+		if (argc > 6)
+		{
+			std::string argConsoleOutput = argv[6];
+			if (argConsoleOutput == "true")
+				consoleOutput = true;
+			else if (argConsoleOutput == "false")
+				consoleOutput = false;
+			else
+				throw 5;
 		}
 	}
 	catch (int argI)
@@ -70,6 +95,12 @@ int main(int argc, char **argv)
 		case 4:
 			std::cout << "Invalid [OUTPUT_MAZE] argument." << std::endl;
 			break;
+		case 5:
+			std::cout << "Invalid [OUTPUT_PATH] argument." << std::endl;
+			break;
+		case 6:
+			std::cout << "Invalid [OUTPUT_CONSOLE] argument." << std::endl;
+			break;
 		}
 		std::cout << "Please refer to README.txt for details." << std::endl;
 		return 1;
@@ -81,31 +112,37 @@ int main(int argc, char **argv)
 	high_resolution_clock::time_point before = high_resolution_clock::now();
 
     // Run the search algorithms
-	runSolver(mazeFileName, dfs, iterations, outputMaze);
+	runSolver(mazeFileName, searchType, iterations, consoleOutput, pathOutput, mazeOutput);
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);
 	std::cout << "Average time taken for one to execute: " << timeTaken.count() / iterations << "s" << std::endl;
 }
 
-void runSolver(std::string mazeFileName, bool dfs, int N, bool outputMaze)
+void runSolver(std::string mazeFileName, SearchType searchType, int N, bool consoleOutput, bool pathOutput, bool mazeOutput)
 {
-	if (dfs)
+	if (searchType == SEARCHTYPE_DFS)
 	{
 		for (int i = 0; i < N; i++)
 		{
-			DFS *dfs = new DFS(mazeFileName, outputMaze);
+			std::unique_ptr<DFS> dfs = std::make_unique<DFS>(mazeFileName, consoleOutput, pathOutput, mazeOutput);
 			dfs->run();
-			delete dfs;
 		}
 	}
-	else
+	else if (searchType == SEARCHTYPE_BFS)
 	{
 		for (int i = 0; i < N; i++)
 		{
-			AStar *astar = new AStar(mazeFileName, outputMaze);
+			std::unique_ptr<BFS> bfs = std::make_unique<BFS>(mazeFileName, consoleOutput, pathOutput, mazeOutput);
+			bfs->run();
+		}
+	}
+	else if (searchType == SEARCHTYPE_ASTAR)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			std::unique_ptr<AStar> astar = std::make_unique<AStar>(mazeFileName, consoleOutput, pathOutput, mazeOutput);
 			astar->run();
-			delete astar;
 		}
 	}
 }

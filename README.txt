@@ -72,17 +72,26 @@ No arguments leads to the default process (maze-Easy.txt, DFS, 1, false).
     estimate for average speed). Output is unaffected by this parameter.
 
 [OUTPUT_MAZE] default: "true"
-    whether to output the maze calculated by the algorithm
+    whether to output the maze calculated by the algorithm to MazeOutput.txt
+
+[OUTPUT_PATH] default: "true"
+    whether to output the path calculated to PathOutput.txt
+
+[OUTPUT_CONSOLE] default: "true"
+    enable all, or disable most console messages
 
 
 Depth-First Search:
-This DFS operates by storing only pointers to the cardinal directions; the LEFT, RIGHT, UP and DOWN vectors.
-(Will work like A*)
+A quick and simple algorithm which isn't optimal.
+
+
+Breadth-First Search:
+A quick and simple algorithm which is optimal, but has a high space complexity.
 
 
 A* Search:
-A* uses integers to store positions in the array, and uses a linked-list structure to store paths along these
-positions.
+An optimal algorithm which minimises the path by distance. (i.e. it finds the shortest path)
+This is equivalent to finding the path with the fewest nodes in this search space.
 
 
 Performance:

@@ -1,0 +1,14 @@
+Format:
+Size - Time / Nodes visited / Nodes in final path
+
+Must have (optimality):
+Easy - 27 steps
+Medium - 321 steps
+Large - 974 steps
+VLarge - 3691 steps
+
+v1.06 - added (optimal)
+Easy - 543us / 79 / 27
+Medium - 7.58ms / 8503 / 321
+Large - 58.9ms / 82028 / 974
+VLarge - 573ms / 796895 / 3691

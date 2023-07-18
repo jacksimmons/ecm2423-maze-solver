@@ -9,7 +9,8 @@
 #include "AStar.hpp"
 
 
-AStar::AStar(std::string filename, bool bOutputMazeToFile) : SearchAlg(filename, bOutputMazeToFile)
+AStar::AStar(std::string filename, bool c_out, bool p_out, bool m_out)
+ : InformedSearch(filename, c_out, p_out, m_out)
 {
     // Logging
     mSearchName = "A*";
@@ -23,55 +24,19 @@ AStar::AStar(std::string filename, bool bOutputMazeToFile) : SearchAlg(filename,
     }
 
     mOpenList.push_front(mStart);
-    mGCosts[mStart] = 0;
+    mGCosts[mStart] = 1;
+
+    setup();
 }
+
 
 void AStar::run()
-{
-    // Complete the search
-    astar();
-
-    // Failure
-    if (mVisited.size() == 0)
-    {
-        std::cout << "Failed to find a solution." << std::endl;
-        return;
-    }
-
-    // Print each position in (x,y) format
-    int pos = mGoal;
-
-    // Termination condition is executed after the step counter and output, so that iStart is included.
-    // mStart points to a non -1 node, as mPath simply stores the shortest path to it.
-    while (true)
-    {
-        mPath.push_front(pos);
-
-        if (pos == mStart || pos == -1)
-            break;
-
-        pos = mVisited.at(pos);
-    }
-
-    // Output the path and maze to files
-    outputPathToFile();
-    if (mOutputMazeToFile)
-        outputMazeToFile();
-    
-    outputCostsToFile();
-
-    // Execution statistics
-    std::cout << "Number of nodes visited: " << calculateNumNodesVisited() << std::endl;
-    std::cout << "Number of steps in final path: " << mPath.size() << std::endl;
-}
-
-void AStar::astar()
 {
     // Loop the algorithm until the list is empty (invalid maze), or the algorithm terminates
     while (!mOpenList.empty())
     {
-        std::cin.get();
-        outputCostsToFile();
+        // std::cin.get();
+        // outputCostsToFile();
 
         // Get current node
         int current = mOpenList.front();
@@ -114,28 +79,46 @@ void AStar::astar()
 
 		for (int i = 0; i < validNeighbours.size(); i++)
 		{
-            int iNeighbour = validNeighbours.at(i);
+            int neighbour = validNeighbours.at(i);
             
             // Distance from start to neighbour via current
-            int tentativeGCost = mGCosts[current] + getPosDist(current, iNeighbour);
+            int tentativeGCost = mGCosts[current] + getPosDist(current, neighbour);
 
-            if (tentativeGCost < mGCosts[iNeighbour])
+            if (tentativeGCost < mGCosts[neighbour])
             {
-                mVisited[iNeighbour] = current;
+                mVisited[neighbour] = current;
 
-                mGCosts[iNeighbour] = tentativeGCost;
-                mFCosts[iNeighbour] = tentativeGCost + getPosDist(iNeighbour, mGoal);
+                mGCosts[neighbour] = tentativeGCost;
+                mFCosts[neighbour] = tentativeGCost + getPosDist(neighbour, mGoal);
 
-                if (std::count(mOpenList.begin(), mOpenList.end(), iNeighbour) == 0)
+                if (std::count(mOpenList.begin(), mOpenList.end(), neighbour) == 0)
                 {
-                    insertIndexIntoOpenList(iNeighbour);
+                    insertIndexIntoOpenList(neighbour);
                 }
             }
 		}
     }
     
     mOpenList.clear();
+
+    // Need to reverse the list for printing
+    int pos = mGoal;
+
+    // Termination condition is executed after the step counter and output, so that mStart is included.
+    // mStart points to a non -1 node, as mPath simply stores the shortest path to it.
+    while (true)
+    {
+        mPath.push_front(pos);
+
+        if (pos == -1)
+            mPath.clear();
+        if (pos == mStart || pos == -1)
+            break;
+
+        pos = mVisited.at(pos);
+    }
 }
+
 
 // (Inplace) Performs one pass of insertion sort to place the front element into its
 // correct position in the list.
@@ -172,30 +155,30 @@ void AStar::insertIndexIntoOpenList(int index)
 }
 
 
-void AStar::outputCostsToFile()
-{
-    std::string fileName = "CostOutput.txt";
-    std::ofstream file;
-    file.open(fileName);
+// void AStar::outputCostsToFile()
+// {
+//     std::string fileName = "CostOutput.txt";
+//     std::ofstream file;
+//     file.open(fileName);
 
-    int size = mRows * mCols;
-    int digits = 0;
-    while (size != 0)
-    {
-        size /= 10;
-        digits++;
-    }
+//     int size = mRows * mCols;
+//     int digits = 0;
+//     while (size != 0)
+//     {
+//         size /= 10;
+//         digits++;
+//     }
     
-    std::cout << "[ ";
-    for (int i = 0; i < mRows * mCols; i++)
-    {
-        int cost = mGCosts[i];
-        if (cost == INT_MAX)
-            cost = -1;
-        std::cout << std::setw(digits) << std::to_string(cost) << " ";
-        if (i % mCols == mCols - 1)
-            std::cout << "]" << std::endl << "[ ";
-    }
-    std::cout << "]" << std::endl;
-    file.close();
-}
+//     std::cout << "[ ";
+//     for (int i = 0; i < mRows * mCols; i++)
+//     {
+//         int cost = mGCosts[i];
+//         if (cost == INT_MAX)
+//             cost = -1;
+//         std::cout << std::setw(digits) << std::to_string(cost) << " ";
+//         if (i % mCols == mCols - 1)
+//             std::cout << "]" << std::endl << "[ ";
+//     }
+//     std::cout << "]" << std::endl;
+//     file.close();
+// }

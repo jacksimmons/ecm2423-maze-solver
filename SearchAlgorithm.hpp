@@ -8,7 +8,7 @@
 #include <deque>
 
 
-class SearchAlg {
+class Search {
 protected:
     std::string mFileName;
     std::string mSearchName;
@@ -17,15 +17,17 @@ protected:
     std::deque<int> mPath;
     std::vector<int> mVisited;
 
-    int mStart;
-    int mGoal;
-
-    bool mOutputMazeToFile;
+    bool mOutputConsole; // Console output
+    bool mOutputPath; // Path output
+    bool mOutputMaze; // Maze output
 
     int mRows;
     int mCols;
+    int mStart;
+    int mGoal;
 public:
-    SearchAlg(std::string filename, bool outputMaze);
+    Search(std::string filename, bool console, bool path, bool maze);
+    void setup();
     virtual void run() = 0;
 
     void loadMaze();
@@ -35,7 +37,6 @@ public:
     int getPosX(int pos);
     int getPosY(int pos);
 
-    int getPosDist(int pos1, int pos2);
     int getPosPlusDir(int pos, int dirX, int dirY);
 
     std::string posToStr(int pos);
@@ -44,4 +45,13 @@ public:
 
     int calculateNumNodesVisited();
 };
+
+
+class InformedSearch : public Search {
+public:
+    InformedSearch(std::string, bool, bool, bool);
+    int getPosDist(int pos1, int pos2);
+};
+
+
 #endif
