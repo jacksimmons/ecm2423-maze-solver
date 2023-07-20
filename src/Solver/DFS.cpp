@@ -4,11 +4,11 @@
 #include <stack>
 
 #include "DFS.hpp"
-#include "Maze.hpp"
+#include "../Maze.hpp"
 
 
 DFS::DFS(std::string fileName, bool c_out, bool p_out, bool m_out)
- : Search(fileName, c_out, p_out, m_out)
+: SearchAlgorithm(fileName, c_out, p_out, m_out)
 {
     mSearchName = "DFS";
 
@@ -17,7 +17,7 @@ DFS::DFS(std::string fileName, bool c_out, bool p_out, bool m_out)
         mVisited.push_back(-1);
     }
 
-    // Mark starting node as visited as we start here (visited is != -1, see InformedSearch.cpp)
+    // Mark starting node as visited as we start here (visited is != -1, see InformedSearchAlgorithm.cpp)
     mVisited[mStart] = 0;
     mPath.push_back(mStart);
 

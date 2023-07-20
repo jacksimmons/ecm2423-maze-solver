@@ -3,10 +3,11 @@
 #include <stdexcept>
 
 #include "SearchAlgorithm.hpp"
-#include "Maze.hpp"
+#include "../Maze.hpp"
 
 
-Search::Search(std::string filename, bool consoleOutput, bool pathOutput, bool mazeOutput)
+SearchAlgorithm::SearchAlgorithm(std::string filename, bool consoleOutput, bool pathOutput, bool mazeOutput)
+ : SearchSpace()
 {
     mStart = -1;
     mGoal = -1;
@@ -30,7 +31,7 @@ Search::Search(std::string filename, bool consoleOutput, bool pathOutput, bool m
 }
 
 
-void Search::setup()
+void SearchAlgorithm::setup()
 {
     // Complete the search
     run();
@@ -58,7 +59,7 @@ void Search::setup()
 
 
 // Extracts data from the maze file into corresponding data structures.
-void Search::loadMaze()
+void SearchAlgorithm::loadMaze()
 {
     // Create input file stream
     std::ifstream fin;
@@ -114,52 +115,13 @@ void Search::loadMaze()
 }
 
 
-// Get the col component of a position.
-int Search::getPosX(int pos)
-{
-    return pos % mCols;
-}
-
-
-// Get the row component of a position.
-int Search::getPosY(int pos)
-{
-    return pos / mCols;
-}
-
-
-// Convert two coordinates to a position in the maze list.
-int Search::cartesianToPos(int posx, int posy)
-{
-    return (posy) * mCols + posx;
-}
-
-
-// Convert a position in the maze list to a string coordinate.
-std::string Search::posToStr(int pos)
-{
-    std::string x, y;
-    x = std::to_string(getPosX(pos));
-    y = std::to_string(getPosY(pos));
-    std::string str = (std::string)"(" + x + ", " + y + ")";
-    return str;
-}
-
-
-// Returns the position moved in a given direction (dirX and dirY should be -1, 0 or 1).
-int Search::getPosPlusDir(int pos, int dirX, int dirY)
-{
-    return pos + dirX + (mCols * dirY);
-}
-
-
 // Output the path to PathOutput.txt.
-void Search::outputPathToFile()
+void SearchAlgorithm::outputPathToFile()
 {
-    std::string fileName = "PathOutput.txt";
+    std::string fileName = "out/PathOutput.txt";
     std::ofstream file;
     file.open(fileName);
-    file << "--- " << mSearchName << " SEARCH " << "[" << mFileName << "]" << std::endl;
+    file << mSearchName << " SEARCH " << "[" << mFileName << "]" << std::endl;
 
     for (int i = 0; i < mPath.size(); i++)
     {
@@ -170,9 +132,9 @@ void Search::outputPathToFile()
 
 
 // Output the maze with the found path and visited nodes on it to MazeOutput.txt.
-void Search::outputMazeToFile()
+void SearchAlgorithm::outputMazeToFile()
 {
-    std::string fileName = "MazeOutput.txt";
+    std::string fileName = "out/MazeOutput.txt";
     std::ofstream file;
     file.open(fileName);
 
@@ -209,7 +171,7 @@ void Search::outputMazeToFile()
 
 
 // Calculate the number of visited nodes
-int Search::calculateNumNodesVisited()
+int SearchAlgorithm::calculateNumNodesVisited()
 {
 	int numNodes = 0;
 	for (int i = 0; i < mRows * mCols; i++)
@@ -223,15 +185,12 @@ int Search::calculateNumNodesVisited()
 }
 
 
-InformedSearch::InformedSearch(std::string fileName, bool c_out, bool p_out, bool m_out)
- : Search(fileName, c_out, p_out, m_out)
-{
-
-}
+InformedSearchAlgorithm::InformedSearchAlgorithm(std::string fileName, bool c_out, bool p_out, bool m_out)
+ : SearchAlgorithm(fileName, c_out, p_out, m_out) {}
 
 
 // Get the distance between two positions.
-int InformedSearch::getPosDist(int i1, int i2)
+int InformedSearchAlgorithm::getPosDist(int i1, int i2)
 {
     return abs(getPosX(i1) - getPosX(i2)) + abs(getPosY(i1) - getPosY(i2));
 }

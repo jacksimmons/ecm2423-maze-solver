@@ -1,5 +1,5 @@
-#ifndef MAZE_H
-#define MAZE_H 1
+#ifndef MAZE_HPP
+#define MAZE_HPP
 
 // Define node macros
 #define EMPTY '-'

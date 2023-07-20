@@ -1,3 +1,6 @@
+#ifndef ASTAR_HPP
+#define ASTAR_HPP
+
 #include <vector>
 #include <list>
 #include <deque>
@@ -6,10 +9,9 @@
 #include <unordered_map>
 
 #include "SearchAlgorithm.hpp"
-#include "Maze.hpp"
 
 
-class AStar : public InformedSearch {
+class AStar : public InformedSearchAlgorithm {
 private:    
     std::deque<int> mOpenList;
 
@@ -22,3 +24,4 @@ public:
     // Carries out one pass of an insertion sort, so that the open list acts a priority queue.
     void insertIndexIntoOpenList(int index);
 };
+#endif

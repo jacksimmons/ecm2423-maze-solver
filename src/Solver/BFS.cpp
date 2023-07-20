@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "BFS.hpp"
-#include "Maze.hpp"
+#include "../Maze.hpp"
 
 
 BFS::BFS(std::string filename, bool c_out, bool p_out, bool m_out) 
-: Search(filename, c_out, p_out, m_out)
+: SearchAlgorithm(filename, c_out, p_out, m_out)
 {
     // Logging
     mSearchName = "BFS";
@@ -16,7 +16,7 @@ BFS::BFS(std::string filename, bool c_out, bool p_out, bool m_out)
         mParentList.push_back(-1);
     }
 
-    // Mark starting node as visited as we start here (visited is != -1, see InformedSearch.cpp)
+    // Mark starting node as visited as we start here (visited is != -1, see InformedSearchAlgorithm.cpp)
     mVisited[mStart] = 0;
     mPath.push_back(mStart);
 

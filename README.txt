@@ -51,34 +51,33 @@ MazeOutput.txt output is disabled by default, since it is slow for large mazes.
 
 Compiling and running:
 1. g++ *.cpp -o [executable-name]
-2. ./[executable-name] [MAZE_FILE: string] [ALGOITHM: string] [ITERATIONS: uint] [OUTPUT_MAZE: bool]
+2. ./[executable-name] [args]
 
 No arguments leads to the default process (maze-Easy.txt, DFS, 1, false).
 
-[MAZE_FILE] default: "maze-Easy.txt"
-    The name of any maze file under the mazes folder, that you want solved.
+[-maze/-m [string]] default: "maze-Easy.txt"
+    Provide the name of any maze file under the mazes folder, that you want solved.
     Additionally, the following phrases can be used as shortcuts for the 4 default mazes:
     "E" - maze-Easy.txt
     "M" - maze-Medium.txt
     "L" - maze-Large.txt
     "VL" - maze-VLarge.txt
 
+[-algorithm/-alg/-a [string]] default: "dfs"
+    Provide the search algorithm to use, as one lowercase word; "astar" or "dfs".
 
-[ALGORITHM] default: "dfs"
-    The search algorithm to use, as one lowercase word; "astar" or "dfs".
-
-[ITERATIONS] default: "1"
-    An integer greater than 0. The number of executions to carry out (use more than 1 to get a better
+[-iterations/-iter/-i [int>0]] default: "1"
+    Provide the number of executions to carry out (use more than 1 to get a better
     estimate for average speed). Output is unaffected by this parameter.
 
-[OUTPUT_MAZE] default: "true"
-    whether to output the maze calculated by the algorithm to MazeOutput.txt
+[-no-console-output/-no-console]
+    Disables algorithm console output.
 
-[OUTPUT_PATH] default: "true"
-    whether to output the path calculated to PathOutput.txt
+[-no-path-output/-no-path]
+    Disables output of the path calculated to PathOutput.txt
 
-[OUTPUT_CONSOLE] default: "true"
-    enable all, or disable most console messages
+[-no-maze-output/-no-maze]
+    Disables output of the solved maze to MazeOutput.txt
 
 
 Depth-First Search:

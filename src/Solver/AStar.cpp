@@ -7,10 +7,12 @@
 #include <cmath>
 
 #include "AStar.hpp"
+#include "../Maze.hpp"
+
 
 
 AStar::AStar(std::string filename, bool c_out, bool p_out, bool m_out)
- : InformedSearch(filename, c_out, p_out, m_out)
+: InformedSearchAlgorithm(filename, c_out, p_out, m_out)
 {
     // Logging
     mSearchName = "A*";
