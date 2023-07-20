@@ -22,7 +22,7 @@ AStar::AStar(std::string filename, bool c_out, bool p_out, bool m_out)
     {
         mGCosts.push_back(INT_MAX);
         mFCosts.push_back(INT_MAX);
-        mVisited.push_back(-1);
+        mClosedList.push_back(-1);
     }
 
     mOpenList.push_front(mStart);
@@ -85,7 +85,7 @@ void AStar::run()
 
             if (tentativeGCost < mGCosts[neighbour])
             {
-                mVisited[neighbour] = current;
+                mClosedList[neighbour] = current;
 
                 mGCosts[neighbour] = tentativeGCost;
                 mFCosts[neighbour] = tentativeGCost + getPosDist(neighbour, mGoal);
@@ -114,7 +114,7 @@ void AStar::run()
         if (pos == mStart || pos == -1)
             break;
 
-        pos = mVisited.at(pos);
+        pos = mClosedList.at(pos);
     }
 }
 
@@ -151,6 +151,14 @@ void AStar::insertIndexIntoOpenList(int index)
     // The end of the list was reached, and no elements had a higher cost.
     mOpenList.push_back(index);
     return;
+}
+
+
+bool AStar::isVisited(int index)
+{
+    if (mClosedList[index] != -1)
+        return true;
+    return false;
 }
 
 

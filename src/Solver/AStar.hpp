@@ -14,14 +14,17 @@
 class AStar : public InformedSearchAlgorithm {
 private:    
     std::deque<int> mOpenList;
+    std::vector<int> mClosedList;
 
     std::vector<int> mGCosts;
     std::vector<int> mFCosts;
+
 public:
     AStar(std::string, bool, bool, bool);
     void run() override;
 
     // Carries out one pass of an insertion sort, so that the open list acts a priority queue.
     void insertIndexIntoOpenList(int index);
+    bool isVisited(int index) override;
 };
 #endif

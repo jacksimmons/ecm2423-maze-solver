@@ -10,6 +10,10 @@
 #include "../SearchSpace.hpp"
 
 
+constexpr std::string_view PATH_OUTPUT_FILENAME = "out/PathOutput.txt";
+constexpr std::string_view MAZE_OUTPUT_FILENAME = "out/MazeOutput.txt";
+
+
 class SearchAlgorithm : public SearchSpace {
 protected:
     std::string mFileName;
@@ -19,11 +23,6 @@ protected:
     std::vector<char> mMaze;
     // Stores the final path through the maze.
     std::deque<int> mPath;
-    // Data structure of equal size to mMaze.
-    // In A*, this is used as the closed list (each index stores the node it came from).
-    // In DFS/BFS, this is used to just store which nodes have been visited.
-    // Either way, if a value is -1 at index i, then i has not been visited, otherwise it has.
-    std::vector<int> mVisited;
 
     // Whether the algorithm outputs to various media.
     bool mOutputConsole;
@@ -38,6 +37,7 @@ public:
 
     void outputPathToFile();
     void outputMazeToFile();
+    virtual bool isVisited(int index) = 0;
 
     int calculateNumNodesVisited();
 };
@@ -47,6 +47,8 @@ class InformedSearchAlgorithm : public SearchAlgorithm {
 public:
     InformedSearchAlgorithm(std::string, bool, bool, bool);
     int getPosDist(int pos1, int pos2);
+private:
+    virtual bool isVisited(int index) = 0;
 };
 
 

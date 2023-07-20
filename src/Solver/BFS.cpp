@@ -10,14 +10,17 @@ BFS::BFS(std::string filename, bool c_out, bool p_out, bool m_out)
     // Logging
     mSearchName = "BFS";
 
+    mParentList = std::shared_ptr<int[]>(new int[mRows * mCols]);
+    mVisited = std::shared_ptr<bool[]>(new bool[mRows * mCols]);
+
     for (int i = 0; i < mRows * mCols; i++)
     {
-        mVisited.push_back(-1);
-        mParentList.push_back(-1);
+        mVisited[i] = false;
+        mParentList[i] = -1;
     }
 
     // Mark starting node as visited as we start here (visited is != -1, see InformedSearchAlgorithm.cpp)
-    mVisited[mStart] = 0;
+    mVisited[mStart] = true;
     mPath.push_back(mStart);
 
     setup();
@@ -57,9 +60,9 @@ void BFS::run()
         {
             int adj = adjacencies[i];
             // If adjacency hasn't been explored
-            if (mVisited[adj] == -1)
+            if (!mVisited[adj])
             {
-                mVisited[adj] = 0;
+                mVisited[adj] = true;
                 mParentList[adj] = current;
                 mPath.push_back(adj);
             }
@@ -78,6 +81,12 @@ void BFS::run()
         if (pos == mStart || pos == -1)
             break;
 
-        pos = mParentList.at(pos);
+        pos = mParentList[pos];
     }
+}
+
+
+bool BFS::isVisited(int index)
+{
+    return mVisited[index];
 }

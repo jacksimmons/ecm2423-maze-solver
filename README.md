@@ -35,6 +35,8 @@ With the above descriptions, here is an example (dimensions 10x5):
 ## With make
 	 make
 	./maze_solver
+	Use "make -B" if it is not updating correctly (e.g. it says maze_solver is up
+	to date when it is not).
 
 ## Without make
 Copy and paste the command from the Makefile into your terminal.

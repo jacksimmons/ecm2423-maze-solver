@@ -46,6 +46,7 @@ void SearchAlgorithm::setup()
     // File output
     if (mOutputPath)
 	    outputPathToFile();
+        
     if (mOutputMaze)
         outputMazeToFile();
     
@@ -118,7 +119,7 @@ void SearchAlgorithm::loadMaze()
 // Output the path to PathOutput.txt.
 void SearchAlgorithm::outputPathToFile()
 {
-    std::string fileName = "out/PathOutput.txt";
+    std::string fileName = (std::string)PATH_OUTPUT_FILENAME;
     std::ofstream file;
     file.open(fileName);
     file << mSearchName << " SEARCH " << "[" << mFileName << "]" << std::endl;
@@ -131,10 +132,9 @@ void SearchAlgorithm::outputPathToFile()
 }
 
 
-// Output the maze with the found path and visited nodes on it to MazeOutput.txt.
 void SearchAlgorithm::outputMazeToFile()
 {
-    std::string fileName = "out/MazeOutput.txt";
+    std::string fileName = (std::string)MAZE_OUTPUT_FILENAME;
     std::ofstream file;
     file.open(fileName);
 
@@ -147,27 +147,25 @@ void SearchAlgorithm::outputMazeToFile()
 
             // Default is the original maze value
             char c = mMaze[index];
+
             if (c == EMPTY)
             {
-                if (mVisited.at(index) != -1)
+                if (isVisited(index))
                 {
                     c = VISITED;
                 }
-
                 if (std::find(mPath.begin(), mPath.end(), index) != mPath.end())
                 {
                     c = PATH;
                 }
             }
-            // Output the character c to file
             file << c;
         }
-        // Newline for next row
         file << std::endl;
     }
-
     file.close();
 }
+
 
 
 // Calculate the number of visited nodes
@@ -176,10 +174,8 @@ int SearchAlgorithm::calculateNumNodesVisited()
 	int numNodes = 0;
 	for (int i = 0; i < mRows * mCols; i++)
 	{
-		if (mVisited[i] != -1)
-		{
-			numNodes++;
-		}
+        if (isVisited(i))
+            numNodes++;
 	}
     return numNodes;
 }

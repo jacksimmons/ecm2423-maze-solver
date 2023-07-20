@@ -1,4 +1,4 @@
---- DFS SEARCH [maze-Easy.txt]
+DFS SEARCH [maze-Easy.txt]
 (1, 0)
 (1, 1)
 (2, 1)

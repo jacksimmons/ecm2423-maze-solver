@@ -12,13 +12,15 @@ DFS::DFS(std::string fileName, bool c_out, bool p_out, bool m_out)
 {
     mSearchName = "DFS";
 
+    mVisited = std::shared_ptr<bool[]>(new bool[mRows * mCols]);
+
     for (int i = 0; i < mRows * mCols; i++)
     {
-        mVisited.push_back(-1);
+        mVisited[i] = false;
     }
 
     // Mark starting node as visited as we start here (visited is != -1, see InformedSearchAlgorithm.cpp)
-    mVisited[mStart] = 0;
+    mVisited[mStart] = false;
     mPath.push_back(mStart);
 
     setup();
@@ -44,6 +46,7 @@ void DFS::run()
         // Check if the direction has been assigned, if not calculate it
         if (dirX == 0 && dirY == 0)
         {
+
             int selectedDirX;
             int selectedDirY;
 
@@ -53,26 +56,24 @@ void DFS::run()
             int left = getPosPlusDir(current, -1, 0);
             int right = getPosPlusDir(current, 1, 0);
 
-            // Current row
-            int currentX = getPosX(current);
             int currentY = getPosY(current);
 
             // Find a valid direction to travel down that hasn't been explored and doesn't lead into a wall
             // ! Prefers UP !
-            if (currentY > 0 && (mMaze[up] != WALL) && mVisited[up] == -1)
+            if (up > 0 && (mMaze[up] != WALL) && !mVisited[up])
                 { selectedDirX = 0; selectedDirY = -1; }            
-            else if (currentY < mRows - 1 && (mMaze[down] != WALL) && mVisited[down] == -1)
+            else if ((down < mRows * mCols) && (mMaze[down] != WALL) && !mVisited[down])
                 { selectedDirX = 0; selectedDirY = 1; }
-            else if (currentX > 0 && (mMaze[left] != WALL) && mVisited[left] == -1)
+            else if (left > 0 && currentY == getPosY(left) && (mMaze[left] != WALL) && !mVisited[left])
                 { selectedDirX = -1, selectedDirY = 0; }
-			else if (currentX < mCols - 1 && (mMaze[right] != WALL) && mVisited[right] == -1)
+			else if (currentY == getPosY(right) && (mMaze[right] != WALL) && !mVisited[right])
                 { selectedDirX = 1; selectedDirY = 0; }
             else
             {
                 // No direction has been assigned, and none are possible (or beneficial), so we backtrack until one is found.
                 // This is the BREADTH part of the search (Depth first, then Breadth)
                 dirX = 0; dirY = 0;
-                mVisited[current] = 0;
+                mVisited[current] = true;
 
                 // Move back element into pos and pop from the stack
                 current = mPath.back();
@@ -98,12 +99,12 @@ void DFS::run()
             // Check if the next node is in the maze
             if (nextInMazeBounds)
             {
-                bool nextTraversable = mMaze[next] != WALL && mVisited[next] == -1;
+                bool nextTraversable = mMaze[next] != WALL && !mVisited[next];
                 // If the next node is not a wall, and hasn't been visited, we can add it to the path.
                 if (nextTraversable)
                 {
                     // Note that pos has been visited
-                    mVisited[current] = 0;
+                    mVisited[current] = true;
 
                     // Push pos onto the stack, and assign posPlusDirection to pos
                     mPath.push_back(current);
@@ -119,4 +120,10 @@ void DFS::run()
 
     // Remove the duplicate start element
     mPath.pop_front();
+}
+
+
+bool DFS::isVisited(int index)
+{
+    return mVisited[index];
 }
