@@ -12,3 +12,9 @@ Easy - 543us / 79 / 27
 Medium - 7.58ms / 8503 / 321
 Large - 58.9ms / 82028 / 974
 VLarge - 573ms / 796895 / 3691
+
+20/07/23 (Optimised)
+maze-Easy.txt: 0.00134027s (Average over 10 iterations)
+maze-Medium.txt: 0.00227071s (Average over 10 iterations)
+maze-Large.txt: 0.00983589s (Average over 10 iterations)
+maze-VLarge.txt: 0.0950603s (Average over 10 iterations)

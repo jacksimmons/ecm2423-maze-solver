@@ -100,7 +100,7 @@ in brackets.
 	Description:
 	Disables algorithm console output.
 
-[-no-path-output/-no-path]
+[-no-path-output/-no-path(0)]
 
 	Usage:
 	-no-path-output
@@ -108,7 +108,7 @@ in brackets.
 	Description:
 	Disables algorithm path output.
 
-[-no-maze-output/-no-maze]
+[-no-maze-output/-no-maze(0)]
 
 	Usage:
 	-no-maze-output
@@ -116,6 +116,15 @@ in brackets.
 	Description:
 	Disables output of the solved maze to MazeOutput.txt
 
+[-stats-output/-stats(0)]
+
+	Usage:
+	-stats-output
+
+	Description:
+	Enables output of statistics to stats/{alg name}_stats.txt.
+	Will ignore -alg argument and instead run each of Easy, Medium, Large and VLarge
+	`iterations` times.
 
 # Output
 
@@ -150,11 +159,12 @@ An optimal algorithm which minimises the path by distance. (i.e. it finds the sh
 This is equivalent to finding the path with the fewest nodes in this search space.
 
 # Performance
-To improve performance, insert -flto (standard link-time optimiser) or -O1, -O2 or -O3 (increasingly aggressive optimisation) compiler optimisation flags before the -o flag in your compiler execution or Makefile:
+To improve performance, insert -flto (standard link-time optimiser) or -O1, -O2 or -O3 (increasingly aggressive optimisation) compiler optimisation flags before the -o flag in your compiler execution:
 
 	Original:
 	... -o ./maze_solver
 	New:
 	... -O3 -flto -o ./maze_solver
 
+Or just run "make maze_solver_opt".
 Since smaller mazes are already very quick, this will only have a major impact on the larger mazes.

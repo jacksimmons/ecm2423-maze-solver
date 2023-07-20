@@ -1,12 +1,18 @@
 #include <iostream>
+#include <fstream>
 #include <chrono>
+#include <iomanip>
 #include <stdexcept>
 #include <memory>
+
+#include <ctime>
 
 #include "MainSolver.hpp"
 #include "DFS.hpp"
 #include "BFS.hpp"
 #include "AStar.hpp"
+
+using namespace std::chrono;
 
 
 int main(int argc, char **argv)
@@ -17,6 +23,7 @@ int main(int argc, char **argv)
 	bool mazeOutput = true;
 	bool pathOutput = true;
 	bool consoleOutput = true;
+	bool statsOutput = false;
 
 	CommandLineError commandLineError = CommandLineError::None;
 
@@ -43,7 +50,7 @@ int main(int argc, char **argv)
 				commandLineError = CommandLineError::NoArgValue;
 				break;
 			}
-			algorithm = getAlgorithm(argv[argIndex+1]);
+			algorithm = strToAlgorithm(argv[argIndex+1]);
 		}
 		else if (arg == "-iterations" || arg == "-iter" || arg == "-i")
 		{
@@ -71,6 +78,11 @@ int main(int argc, char **argv)
 			mazeOutput = false;
 			continue;
 		}
+		else if (arg == "-output-stats" || arg == "-stats")
+		{
+			statsOutput = true;
+			continue;
+		}
 	}
 
 	switch (commandLineError)
@@ -82,17 +94,45 @@ int main(int argc, char **argv)
 			break;
 	}
 
-	using namespace std::chrono;
+	if (statsOutput)
+	{
+		std::string mazes[4] = { "maze-Easy.txt", "maze-Medium.txt", "maze-Large.txt", "maze-VLarge.txt" };
 
-	// Create a clock to measure runtime speed
+		std::string fileName = "stats/" + algorithmToStr(algorithm) + "_stats.txt";
+		std::ofstream file;
+		file.open(fileName, std::ios_base::app);
+		time_t time = system_clock::to_time_t(system_clock::now());
+		file << std::endl << std::put_time(std::localtime(&time), "%d/%m/%y") << std::endl;
+
+		for (int i = 0; i < 4; i++)
+		{
+			handleRunSolver(mazes[i], algorithm, iterations, consoleOutput, pathOutput, mazeOutput, true);
+		}
+	}
+	else
+	{
+		handleRunSolver(mazeFileName, algorithm, iterations, consoleOutput, pathOutput, mazeOutput, false);
+	}
+}
+
+
+void handleRunSolver(std::string maze, Algorithm alg, int iters, bool c_out, bool p_out, bool m_out, bool s_out)
+{
 	high_resolution_clock::time_point before = high_resolution_clock::now();
-
-    // Run the search algorithms
-	runSolver(mazeFileName, algorithm, iterations, consoleOutput, pathOutput, mazeOutput);
+	
+	runSolver(maze, alg, iters, c_out, p_out, m_out);
 
 	high_resolution_clock::time_point after = high_resolution_clock::now();
 	duration<double> timeTaken = duration_cast<duration<double>>(after - before);
-	std::cout << "Average time taken for one to execute: " << timeTaken.count() / iterations << "s" << std::endl;
+
+	if (s_out)
+	{
+		outputStats(timeTaken.count(), algorithmToStr(alg), iters, maze);
+	}
+	else
+	{
+		std::cout << "Average time to complete " << iters << " iterations: " << timeTaken.count() / iters << "s." << std::endl;
+	}
 }
 
 
@@ -125,6 +165,17 @@ void runSolver(std::string mazeFileName, Algorithm alg, int N, bool consoleOutpu
 }
 
 
+void outputStats(double timeTaken, std::string algName, int iters, std::string mazeName)
+{
+	std::string fileName = "stats/" + algName + "_stats.txt";
+	std::ofstream file;
+	file.open(fileName, std::ios_base::app);
+
+	file << mazeName << ": " << timeTaken / iters << "s (Average over " << iters << " iterations)" << std::endl;
+	file.close();
+}
+
+
 std::string getMazeFileName(std::string input)
 {
 	std::string mazeFileName = input;
@@ -140,11 +191,21 @@ std::string getMazeFileName(std::string input)
 }
 
 
-Algorithm getAlgorithm(std::string input)
+Algorithm strToAlgorithm(std::string input)
 {
 	if (input == "bfs")
 		return Algorithm::BFS;
 	if (input == "astar")
 		return Algorithm::AStar;
 	return Algorithm::DFS;
+}
+
+
+std::string algorithmToStr(Algorithm alg)
+{
+	if (alg == Algorithm::BFS)
+		return "bfs";
+	if (alg == Algorithm::AStar)
+		return "astar";
+	return "dfs";
 }
