@@ -2,7 +2,7 @@
 # Overview
 
 ## Prerequisites
->A C++ compiler (e.g. g++, msvc) and C++ compatible processor.
+- A C++ compiler (e.g. g++, msvc) and C++ compatible processor.
 
 ## Mazes
 A maze (maze file) must follow these rules for the program to run as expected:
@@ -24,11 +24,11 @@ Mazes must be placed in the "mazes" folder, and referred to by their local filen
 With the above descriptions, here is an example (dimensions 10x5):
 (This may look strange if you are using a font where -, #, s and g are different widths)
 
-##s#######
-##-#######
-##-------#
-########-#
-########g#
+##s#######  
+##-#######  
+##-------#  
+########-#  
+########g#  
 
 # Compiling
 
