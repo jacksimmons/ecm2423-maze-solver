@@ -50,7 +50,6 @@ with the following default arguments:
 	> console output = true
 	> path output = true
 	> maze output = true
-	> 
 
 Below are all supported arguments, followed by the number of values they require
 in brackets.
@@ -65,10 +64,10 @@ in brackets.
 	Description:
 	Provide the name of any maze file under the mazes folder, that you want solved.
 	Additionally, the following phrases can be used as shortcuts for the 4 default mazes:
-		"E" - maze-Easy.txt
-	    "M" - maze-Medium.txt
-	    "L" - maze-Large.txt
-	    "VL" - maze-VLarge.txt
+	"E" - maze-Easy.txt
+	"M" - maze-Medium.txt
+	"L" - maze-Large.txt
+	"VL" - maze-VLarge.txt
 
 [-algorithm/-alg/-a(1)]
 
