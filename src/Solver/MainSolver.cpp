@@ -113,6 +113,8 @@ int main(int argc, char **argv)
 	{
 		handleRunSolver(mazeFileName, algorithm, iterations, consoleOutput, pathOutput, mazeOutput, false);
 	}
+
+	return 0;
 }
 
 

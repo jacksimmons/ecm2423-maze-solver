@@ -30,4 +30,6 @@ int main(int argc, char **argv)
     int goal = std::rand() % cols + cols * (rows - 1);
 
     std::shared_ptr<GeneratorAlgorithm> generator = std::make_shared<GeneratorAlgorithm>(rows, cols, start, goal);
+
+    return 0;
 }
