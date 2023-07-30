@@ -23,8 +23,3 @@ maze_generator:
 		src/Generator/GeneratorAlgorithm.cpp \
 		src/SearchSpace.cpp \
 		-o maze_generator
-
-maze_game:
-	g++ MazeGame/MazeGame/Main.cpp \
-		MazeGame/MazeGame/Game.cpp \
-		-o maze_game 
